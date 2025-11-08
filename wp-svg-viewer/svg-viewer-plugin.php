@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP SVG Viewer
- * Plugin URI: https://brettterpstra.com
+ * Plugin URI: https://github.com/ttscoff/wp-svg-viewer/
  * Description: Embed interactive SVG files with zoom and pan controls
  * Version: 1.0.1
  * Author: Brett Terpstra
@@ -792,12 +792,12 @@ class SVG_Viewer
 
                     if (!empty($parts)) {
                         $maybe = strtolower($parts[0]);
-                    if ($custom_mode === null && in_array($maybe, $mode_options, true)) {
+                        if ($custom_mode === null && in_array($maybe, $mode_options, true)) {
                             $custom_mode = $maybe;
                             array_shift($parts);
-                    } elseif (in_array($maybe, $alignment_options, true)) {
-                        $alignment = $maybe;
-                        array_shift($parts);
+                        } elseif (in_array($maybe, $alignment_options, true)) {
+                            $alignment = $maybe;
+                            array_shift($parts);
                         }
                     }
 
