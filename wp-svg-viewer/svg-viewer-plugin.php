@@ -3,7 +3,7 @@
  * Plugin Name: WP SVG Viewer
  * Plugin URI: https://github.com/ttscoff/wp-svg-viewer/
  * Description: Embed interactive SVG files with zoom and pan controls
- * Version: 1.0.5
+ * Version: 1.0.6
  * Author: Brett Terpstra
  * Author URI: https://brettterpstra.com
  * License: GPL2
@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
 class SVG_Viewer
 {
     private static $instance = null;
+    private $plugin_version = '1.0.6';
     private $preset_meta_fields = array(
         'svg_viewer_src' => '_svg_src',
         'svg_viewer_height' => '_svg_height',
@@ -46,6 +47,7 @@ class SVG_Viewer
 
     public function __construct()
     {
+        $this->plugin_version = $this->read_plugin_version();
         add_action('plugins_loaded', array($this, 'load_textdomain'));
         add_shortcode('svg_viewer', array($this, 'render_shortcode'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
@@ -65,6 +67,23 @@ class SVG_Viewer
     public function load_textdomain()
     {
         load_plugin_textdomain('svg-viewer', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    }
+
+    /**
+     * Determine the plugin version from the file header.
+     *
+     * @return string
+     */
+    private function read_plugin_version()
+    {
+        $headers = get_file_data(__FILE__, array('Version' => 'Version'));
+        $version = isset($headers['Version']) ? trim((string) $headers['Version']) : '';
+
+        if ($version === '') {
+            $version = '1.0.0';
+        }
+
+        return $version;
     }
 
     /**
@@ -238,14 +257,14 @@ class SVG_Viewer
             'svg-viewer-style',
             plugins_url('css/svg-viewer.css', __FILE__),
             array(),
-            '1.0.0'
+            $this->plugin_version
         );
 
         wp_enqueue_script(
             'svg-viewer-script',
             plugins_url('js/svg-viewer.js', __FILE__),
             array(),
-            '1.0.0',
+            $this->plugin_version,
             true
         );
 
@@ -528,21 +547,21 @@ class SVG_Viewer
             'svg-viewer-style',
             plugins_url('css/svg-viewer.css', __FILE__),
             array(),
-            '1.0.0'
+            $this->plugin_version
         );
 
         wp_enqueue_style(
             'svg-viewer-admin',
             plugins_url('admin/css/admin.css', __FILE__),
             array('svg-viewer-style'),
-            '1.0.0'
+            $this->plugin_version
         );
 
         wp_enqueue_script(
             'svg-viewer-script',
             plugins_url('js/svg-viewer.js', __FILE__),
             array(),
-            '1.0.0',
+            $this->plugin_version,
             true
         );
 
@@ -554,7 +573,7 @@ class SVG_Viewer
             'svg-viewer-admin',
             plugins_url('admin/js/admin.js', __FILE__),
             array('jquery', 'svg-viewer-script'),
-            '1.0.0',
+            $this->plugin_version,
             true
         );
 
