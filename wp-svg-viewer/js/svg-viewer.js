@@ -105,6 +105,7 @@ class SVGViewer {
     this.isLoading = true;
 
     try {
+      console.debug("[SVGViewer]", this.viewerId, "fetching", this.svgUrl);
       const response = await fetch(this.svgUrl);
       if (!response.ok)
         throw new Error(`Failed to load SVG: ${response.status}`);
@@ -114,6 +115,7 @@ class SVGViewer {
       this.svgElement = this.viewport.querySelector("svg");
 
       if (this.svgElement) {
+        console.debug("[SVGViewer]", this.viewerId, "SVG loaded");
         this.prepareSvgElement();
         this.captureBaseDimensions();
         this.currentZoom = this.initialZoom;
@@ -350,6 +352,18 @@ class SVGViewer {
     } else {
       this.baseDimensions = { width: cssWidth, height: cssHeight };
       this.baseOrigin = { x: 0, y: 0 };
+    }
+
+    if (cssWidth <= 1 || cssHeight <= 1) {
+      if (viewBox && viewBox.width && viewBox.height) {
+        cssWidth = viewBox.width;
+        cssHeight = viewBox.height;
+      } else {
+        const fallbackWidth = this.container ? this.container.clientWidth : 0;
+        const fallbackHeight = this.container ? this.container.clientHeight : 0;
+        cssWidth = fallbackWidth || this.baseDimensions.width || 1;
+        cssHeight = fallbackHeight || this.baseDimensions.height || 1;
+      }
     }
 
     this.baseCssDimensions = { width: cssWidth, height: cssHeight };
