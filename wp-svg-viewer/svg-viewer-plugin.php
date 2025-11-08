@@ -3,7 +3,7 @@
  * Plugin Name: WP SVG Viewer
  * Plugin URI: https://github.com/ttscoff/wp-svg-viewer/
  * Description: Embed interactive SVG files with zoom and pan controls
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Brett Terpstra
  * Author URI: https://brettterpstra.com
  * License: GPL2
