@@ -55,6 +55,57 @@
     }
   }
 
+  function initTabs($root) {
+    $root.find(".svg-viewer-tabs").each(function () {
+      const $container = $(this);
+      const $buttons = $container.find(".svg-viewer-tab-button");
+      const $panels = $container.find(".svg-viewer-tab-panel");
+
+      function activateTab(target) {
+        $buttons.each(function () {
+          const $button = $(this);
+          const isTarget = $button.data("tabTarget") === target;
+          $button.toggleClass("is-active", isTarget);
+          $button.attr("aria-selected", isTarget ? "true" : "false");
+        });
+
+        $panels.each(function () {
+          const $panel = $(this);
+          const isTarget = $panel.data("tabPanel") === target;
+          $panel.toggleClass("is-active", isTarget);
+          $panel.attr("aria-hidden", isTarget ? "false" : "true");
+        });
+      }
+
+      function handleActivation(event) {
+        if (
+          event.type === "keydown" &&
+          event.key !== "Enter" &&
+          event.key !== " "
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+        const target = $(this).data("tabTarget");
+        if (target) {
+          activateTab(target);
+        }
+      }
+
+      $buttons.on("click", handleActivation);
+      $buttons.on("keydown", handleActivation);
+
+      const $initial = $buttons.filter(".is-active").first();
+      const defaultTarget = $initial.length
+        ? $initial.data("tabTarget")
+        : $buttons.first().data("tabTarget");
+      if (defaultTarget) {
+        activateTab(defaultTarget);
+      }
+    });
+  }
+
   const DEFAULT_BUTTON_DEFS = {
     zoom_in: {
       class: "zoom-in-btn",
@@ -680,6 +731,8 @@
   }
 
   $(document).ready(function () {
+    initTabs($(document));
+
     $(document).on("click", ".svg-shortcode-copy", function (event) {
       event.preventDefault();
       const $button = $(this);

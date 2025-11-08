@@ -1,0 +1,196 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WP SVG Viewer 1.0.1\n"
+"POT-Creation-Date: 2025-11-08 00:00+0000\n"
+"PO-Revision-Date: 2025-11-08 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: GPT-5 Codex\n"
+"X-Domain: svg-viewer\n"
+
+msgid "Error: SVG preset not found for ID %s."
+msgstr "Erreur : préréglage SVG introuvable pour l’ID %s."
+
+msgid "Error: SVG source not specified. Use [svg_viewer src=\"path/to/file.svg\"]"
+msgstr "Erreur : source SVG non spécifiée. Utilisez [svg_viewer src=\"path/to/file.svg\"]"
+
+msgid "Error: Invalid SVG path."
+msgstr "Erreur : chemin SVG non valide."
+
+msgid "SVG Viewer Presets"
+msgstr "Préréglages SVG Viewer"
+
+msgid "SVG Viewer Preset"
+msgstr "Préréglage SVG Viewer"
+
+msgid "SVG Viewer"
+msgstr "SVG Viewer"
+
+msgid "Add New Preset"
+msgstr "Ajouter un préréglage"
+
+msgid "Add New SVG Viewer Preset"
+msgstr "Ajouter un préréglage SVG Viewer"
+
+msgid "Edit SVG Viewer Preset"
+msgstr "Modifier le préréglage SVG Viewer"
+
+msgid "New SVG Viewer Preset"
+msgstr "Nouveau préréglage SVG Viewer"
+
+msgid "View SVG Viewer Preset"
+msgstr "Voir le préréglage SVG Viewer"
+
+msgid "Search SVG Viewer Presets"
+msgstr "Rechercher des préréglages SVG Viewer"
+
+msgid "No presets found"
+msgstr "Aucun préréglage trouvé"
+
+msgid "No presets found in trash"
+msgstr "Aucun préréglage trouvé dans la corbeille"
+
+msgid "Please select an SVG before loading the preview."
+msgstr "Veuillez sélectionner un SVG avant de charger l’aperçu."
+
+msgid "Captured viewer state from the preview."
+msgstr "État du viewer capturé depuis l’aperçu."
+
+msgid "Unable to capture the current state. Refresh the preview and try again."
+msgstr "Impossible de capturer l’état actuel. Actualisez l’aperçu puis réessayez."
+
+msgid "Shortcode copied to clipboard."
+msgstr "Shortcode copié dans le presse-papiers."
+
+msgid "Press ⌘/Ctrl+C to copy the shortcode."
+msgstr "Appuyez sur ⌘/Ctrl+C pour copier le shortcode."
+
+msgid "SVG Viewer Settings"
+msgstr "Paramètres de SVG Viewer"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Help"
+msgstr "Aide"
+
+msgid "Preset Shortcode"
+msgstr "Shortcode du préréglage"
+
+msgid "Copy"
+msgstr "Copier"
+
+msgid "Use this shortcode in pages or posts to embed this preset."
+msgstr "Utilisez ce shortcode dans des pages ou des articles pour intégrer ce préréglage."
+
+msgid "SVG Source URL"
+msgstr "URL source du SVG"
+
+msgid "https://example.com/my-graphic.svg or uploads/2025/graphic.svg"
+msgstr "https://example.com/my-graphic.svg ou uploads/2025/graphic.svg"
+
+msgid "Select SVG"
+msgstr "Sélectionner un SVG"
+
+msgid "Viewer Height"
+msgstr "Hauteur du viewer"
+
+msgid "Min Zoom (%)"
+msgstr "Zoom minimum (%)"
+
+msgid "Max Zoom (%)"
+msgstr "Zoom maximum (%)"
+
+msgid "Initial Zoom (%)"
+msgstr "Zoom initial (%)"
+
+msgid "Zoom Increment (%)"
+msgstr "Incrément de zoom (%)"
+
+msgid "Center X"
+msgstr "Centre X"
+
+msgid "Center Y"
+msgstr "Centre Y"
+
+msgid "Controls Position"
+msgstr "Position des contrôles"
+
+msgid "Top"
+msgstr "Haut"
+
+msgid "Bottom"
+msgstr "Bas"
+
+msgid "Left"
+msgstr "Gauche"
+
+msgid "Right"
+msgstr "Droite"
+
+msgid "Controls Buttons/Layout"
+msgstr "Boutons/Disposition des contrôles"
+
+msgid ""
+"Combine multiple options with commas. Examples: both, icon, text, compact, "
+"labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,"
+"aligncenter,zoom_in,zoom_out,reset,center,coords"
+msgstr ""
+"Combinez plusieurs options séparées par des virgules. Exemples : both, icon, "
+"text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, "
+"custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords"
+
+msgid "Title (optional)"
+msgstr "Titre (optionnel)"
+
+msgid "Caption (optional)"
+msgstr "Légende (optionnelle)"
+
+msgid "Supports basic HTML formatting."
+msgstr "Prend en charge le HTML de base."
+
+msgid "Load / Refresh Preview"
+msgstr "Charger / Actualiser l’aperçu"
+
+msgid "Use Current View for Initial State"
+msgstr "Utiliser la vue actuelle comme état initial"
+
+msgid ""
+"Help content is not available. Run the \"Render Help\" build step to "
+"regenerate it."
+msgstr ""
+"Le contenu d’aide est indisponible. Exécutez l’étape de build « Render Help » "
+"pour le régénérer."
+
+msgid "Zoom In"
+msgstr "Zoom avant"
+
+msgid "Zoom In (Ctrl +)"
+msgstr "Zoom avant (Ctrl +)"
+
+msgid "Zoom Out"
+msgstr "Zoom arrière"
+
+msgid "Zoom Out (Ctrl -)"
+msgstr "Zoom arrière (Ctrl -)"
+
+msgid "Reset Zoom"
+msgstr "Réinitialiser le zoom"
+
+msgid "Center View"
+msgstr "Centrer la vue"
+
+msgid "Copy Center"
+msgstr "Copier le centre"
+
+msgid "Copy current center coordinates"
+msgstr "Copier les coordonnées du centre actuel"
+
+msgid "Shortcode"
+msgstr "Shortcode"
+

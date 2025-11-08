@@ -1,0 +1,435 @@
+<h1 id="wpsvgviewer">WP SVG Viewer</h1>
+
+<p>Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tools. Version 1.0.1 introduces a visual preset editor, icon-based controls, and deeper shortcode options.</p>
+
+<hr />
+
+<h2 id="contents">Contents</h2>
+
+<ol>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#shortcode-reference">Shortcode Reference</a></li>
+<li><a href="#admin-preset-editor">Admin Preset Editor</a></li>
+<li><a href="#using-presets-in-postspages">Using Presets in Posts/Pages</a></li>
+<li><a href="#preview-workflow">Preview Workflow</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#styling-css-hooks">Styling (CSS Hooks)</a></li>
+<li><a href="#tips--troubleshooting">Tips &amp; Troubleshooting</a></li>
+<li><a href="#changelog-highlights-101">Changelog Highlights</a></li>
+</ol>
+
+<hr />
+
+<h2 id="installation">Installation</h2>
+
+<ol>
+<li><strong>Unzip the plugin archive</strong></li>
+</ol>
+
+<ul>
+<li> Download <code>wp-svg-viewer.zip</code>.</li>
+<li> Unzip it locally; you will get a folder named <code>wp-svg-viewer</code>.</li>
+</ul>
+
+<ol>
+<li><strong>Upload the plugin</strong></li>
+</ol>
+
+<ul>
+<li> Copy the entire <code>wp-svg-viewer</code> folder into your WordPress installation at <code>/wp-content/plugins/</code>.</li>
+</ul>
+
+<ol>
+<li><strong>Activate</strong></li>
+</ol>
+
+<ul>
+<li> In the WordPress admin, navigate to <strong>Plugins</strong> and click <strong>Activate</strong> on “SVG Viewer”.</li>
+</ul>
+
+<hr />
+
+<h2 id="quickstart">Quick Start</h2>
+
+<pre><code class="text">[svg_viewer src=&quot;/wp-content/uploads/diagrams/system-map.svg&quot;]
+</code></pre>
+
+<ul>
+<li>Place the shortcode in a classic editor, Gutenberg shortcode block, or template.</li>
+<li>The SVG renders with default height (600px), zoom controls, pan/scroll behaviour, keyboard shortcuts, and responsive layout.</li>
+</ul>
+
+<hr />
+
+<h2 id="shortcodereference">Shortcode Reference</h2>
+
+<table>
+<colgroup>
+<col />
+<col />
+<col />
+<col />
+</colgroup>
+
+<thead>
+<tr>
+	<th> Attribute    </th>
+	<th> Type       </th>
+	<th> Default </th>
+	<th> Description                     </th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+	<td> <code>src</code>     </td>
+	<td> string (required)    </td>
+	<td> –  </td>
+	<td> SVG URL. Supports absolute URLs, <code>/absolute/path.svg</code>, or relative to the uploads directory. </td>
+</tr>
+<tr>
+	<td> <code>height</code>    </td>
+	<td> string      </td>
+	<td> <code>600px</code> </td>
+	<td> CSS height of the viewer. Accepts px, vh, %, etc.           </td>
+</tr>
+<tr>
+	<td> <code>class</code>     </td>
+	<td> string      </td>
+	<td> –  </td>
+	<td> Additional class appended to the wrapper.             </td>
+</tr>
+<tr>
+	<td> <code>zoom</code>     </td>
+	<td> number      </td>
+	<td> <code>100</code> </td>
+	<td> Initial zoom percentage.                  </td>
+</tr>
+<tr>
+	<td> <code>min_zoom</code>    </td>
+	<td> number      </td>
+	<td> <code>25</code> </td>
+	<td> Minimum zoom percentage allowed.                </td>
+</tr>
+<tr>
+	<td> <code>max_zoom</code>    </td>
+	<td> number      </td>
+	<td> <code>800</code> </td>
+	<td> Maximum zoom percentage allowed.                </td>
+</tr>
+<tr>
+	<td> <code>zoom_step</code>    </td>
+	<td> number      </td>
+	<td> <code>10</code> </td>
+	<td> Increment used by buttons/keyboard shortcuts.            </td>
+</tr>
+<tr>
+	<td> <code>center_x</code> / <code>center_y</code> </td>
+	<td> number      </td>
+	<td> –  </td>
+	<td> Manual center point in SVG units. Defaults to viewBox center.        </td>
+</tr>
+<tr>
+	<td> <code>show_coords</code>   </td>
+	<td> boolean      </td>
+	<td> <code>false</code> </td>
+	<td> Appends “Copy Center” button for debugging coordinate values.        </td>
+</tr>
+<tr>
+	<td> <code>controls_position</code>  </td>
+	<td> <code>top</code>/<code>bottom</code>/<code>left</code>/<code>right</code> </td>
+	<td> <code>top</code> </td>
+	<td> Placement of the entire control group.              </td>
+</tr>
+<tr>
+	<td> <code>controls_buttons</code>  </td>
+	<td> string      </td>
+	<td> <code>both</code> </td>
+	<td> Comma-delimited mode/align/button list. See table below.          </td>
+</tr>
+<tr>
+	<td> <code>title</code>     </td>
+	<td> string      </td>
+	<td> –  </td>
+	<td> Optional heading above the viewer. HTML allowed.            </td>
+</tr>
+<tr>
+	<td> <code>caption</code>    </td>
+	<td> string      </td>
+	<td> –  </td>
+	<td> Optional caption below the viewer. HTML allowed.            </td>
+</tr>
+<tr>
+	<td> <code>id</code>     </td>
+	<td> number      </td>
+	<td> –  </td>
+	<td> Reference a saved preset (admin). Inline attributes override preset values.     </td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="controls_buttonscheatsheet"><code>controls_buttons</code> Cheat Sheet</h3>
+
+<pre><code class="text">controls_buttons=&quot;MODE,ALIGNMENT,BUTTON_1,BUTTON_2,...&quot;
+</code></pre>
+
+<p>Mode keywords (optional):</p>
+
+<ul>
+<li><code>both</code> (default)</li>
+<li><code>icon</code></li>
+<li><code>text</code></li>
+<li><code>compact</code></li>
+<li><code>labels_on_hover</code></li>
+<li><code>minimal</code></li>
+<li><code>hidden</code> / <code>none</code></li>
+</ul>
+
+<p>Alignment keywords (optional, anywhere in list):</p>
+
+<ul>
+<li><code>alignleft</code></li>
+<li><code>aligncenter</code></li>
+<li><code>alignright</code></li>
+</ul>
+
+<p>Button names (pick any order):</p>
+
+<ul>
+<li><code>zoom_in</code>, <code>zoom_out</code>, <code>reset</code>, <code>center</code>, <code>coords</code> <em>(coords button only renders if <code>show_coords=&quot;true&quot;</code>)</em></li>
+</ul>
+
+<p>Example:</p>
+
+<pre><code class="text">[svg_viewer
+  src=&quot;/uploads/system-map.svg&quot;
+  controls_position=&quot;right&quot;
+  controls_buttons=&quot;icon,aligncenter,zoom_in,zoom_out,reset,center&quot;
+]
+</code></pre>
+
+<hr />
+
+<h2 id="adminpreseteditor">Admin Preset Editor</h2>
+
+<h3 id="location">Location</h3>
+
+<p><code>WordPress Dashboard → SVG Viewer → Presets</code></p>
+
+<h3 id="fields">Fields</h3>
+
+<table>
+<colgroup>
+<col />
+<col />
+</colgroup>
+
+<thead>
+<tr>
+	<th> Field      </th>
+	<th> Description                 </th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+	<td> <strong>SVG Source URL</strong>   </td>
+	<td> Choose or upload an SVG from the media library. Required before preview loads. </td>
+</tr>
+<tr>
+	<td> <strong>Viewer Height</strong>   </td>
+	<td> Same as shortcode <code>height</code>.             </td>
+</tr>
+<tr>
+	<td> <strong>Zoom Settings</strong>   </td>
+	<td> Minimum, maximum, step, and initial zoom percentages.       </td>
+</tr>
+<tr>
+	<td> <strong>Center Coordinates</strong>  </td>
+	<td> Override auto centering with explicit <code>center_x</code>/<code>center_y</code>.     </td>
+</tr>
+<tr>
+	<td> <strong>Controls Position</strong>  </td>
+	<td> Dropdown for <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>.         </td>
+</tr>
+<tr>
+	<td> <strong>Controls Buttons/Layout</strong> </td>
+	<td> Text field following the <code>MODE,ALIGN,buttons…</code> pattern described above.  </td>
+</tr>
+<tr>
+	<td> <strong>Title &amp; Caption</strong>   </td>
+	<td> Optional, displayed above/below the viewer wrapper.       </td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="previewpane">Preview Pane</h3>
+
+<ul>
+<li><strong>Load / Refresh Preview</strong>: Injects the SVG using the current field values.</li>
+<li><strong>Use Current View for Initial State</strong>: Captures the visible zoom level and center point from the preview and writes them back into the form (ideal for fine-tuning coordinates visually).</li>
+<li><strong>Copy Center</strong>: When <code>show_coords</code> is enabled, the button copies coordinates to the clipboard.</li>
+</ul>
+
+<h3 id="presetshortcodes">Preset Shortcodes</h3>
+
+<ul>
+<li>At the top of the preset editor and in the presets list table you’ll find a copy-ready snippet in the form of <code>[svg_viewer id=&quot;123&quot;]</code>.</li>
+<li>Click <strong>Copy</strong> to put the shortcode on the clipboard without selecting manually.</li>
+</ul>
+
+<hr />
+
+<h2 id="usingpresetsinpostspages">Using Presets in Posts/Pages</h2>
+
+<ol>
+<li>Create or edit a preset as described above.</li>
+<li>Copy the generated shortcode (<code>[svg_viewer id=&quot;123&quot;]</code>).</li>
+<li>Paste into:</li>
+</ol>
+
+<ul>
+<li> Classic editor (Visual tab: use Shortcode block or paste directly).</li>
+<li> Block editor (Shortcode block or HTML block).</li>
+<li> Template files via <code>do_shortcode()</code>.</li>
+</ul>
+
+<ol>
+<li>Override on a per-use basis if needed:</li>
+</ol>
+
+<pre><code class="```text">   [svg_viewer id=&quot;123&quot; controls_buttons=&quot;icon,alignright,zoom_in,zoom_out&quot;]
+
+</code></pre>
+
+<hr />
+
+<h2 id="previewworkflow">Preview Workflow</h2>
+
+<ol>
+<li><strong>Load / Refresh Preview</strong> once the SVG path is entered.</li>
+<li>Drag or scroll the SVG to the desired default view.</li>
+<li><strong>Use Current View for Initial State</strong> to stash those coordinates/zoom.</li>
+<li>Optionally toggle <code>show_coords</code> to display the current x/y values of the viewport center.</li>
+<li>Save/publish the preset and test the shortcode on the front end.</li>
+</ol>
+
+<hr />
+
+<h2 id="examples">Examples</h2>
+
+<pre><code class="text">[svg_viewer src=&quot;/uploads/floorplan.svg&quot;]
+</code></pre>
+
+<pre><code class="text">[svg_viewer
+  src=&quot;/uploads/system-map.svg&quot;
+  height=&quot;100vh&quot;
+  controls_position=&quot;bottom&quot;
+  controls_buttons=&quot;compact,aligncenter,zoom_in,zoom_out,reset,center&quot;
+  zoom=&quot;175&quot;
+  min_zoom=&quot;50&quot;
+  max_zoom=&quot;400&quot;
+]
+</code></pre>
+
+<pre><code class="text">[svg_viewer
+  id=&quot;42&quot;
+  controls_buttons=&quot;icon,alignright,zoom_in,zoom_out&quot;
+]
+</code></pre>
+
+<pre><code class="text">[svg_viewer
+  src=&quot;/uploads/mind-map.svg&quot;
+  show_coords=&quot;true&quot;
+  controls_buttons=&quot;icon,alignleft,zoom_in,zoom_out,reset,center,coords&quot;
+]
+</code></pre>
+
+<hr />
+
+<h2 id="stylingcsshooks">Styling (CSS Hooks)</h2>
+
+<p>Wrapper classes added by the plugin:</p>
+
+<ul>
+<li><code>.svg-viewer-wrapper</code> – outer container</li>
+<li><code>.svg-viewer-main</code> – wraps controls and SVG container</li>
+<li><code>.svg-controls</code> – control bar</li>
+<li><code>.controls-position-{top|bottom|left|right}</code></li>
+<li><code>.controls-mode-{icon|text|both|compact|labels-on-hover|minimal}</code></li>
+<li><code>.controls-align-{alignleft|aligncenter|alignright}</code></li>
+<li><code>.svg-viewer-btn</code>, <code>.btn-icon</code>, <code>.btn-text</code></li>
+<li><code>.svg-container</code>, <code>.svg-viewport</code>, <code>.coord-output</code>, <code>.zoom-display</code></li>
+</ul>
+
+<p>Example overrides:</p>
+
+<pre><code class="css">.svg-viewer-wrapper.custom-map {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.svg-viewer-wrapper.custom-map .svg-controls {
+  background: #111;
+  color: #fff;
+  gap: 6px;
+}
+
+.svg-viewer-wrapper.custom-map .svg-viewer-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.svg-viewer-wrapper.custom-map .svg-viewer-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+</code></pre>
+
+<hr />
+
+<h2 id="tipstroubleshooting">Tips &amp; Troubleshooting</h2>
+
+<h3 id="svgpreparation">SVG Preparation</h3>
+
+<ul>
+<li>Remove hard-coded width/height if possible; rely on <code>viewBox</code>.</li>
+<li>Ensure the SVG renders correctly when opened directly in a browser.</li>
+<li>Compress large SVGs to keep loading snappy.</li>
+</ul>
+
+<h3 id="commonissues">Common Issues</h3>
+
+<ul>
+<li><strong>Blank viewer</strong>: check for 404 on the SVG path, confirm the file is accessible without authentication.</li>
+<li><strong>Scaling looks wrong</strong>: verify the SVG has an accurate <code>viewBox</code>.</li>
+<li><strong>Controls disappear</strong>: check <code>controls_buttons</code> for <code>hidden</code> or empty button list.</li>
+<li><strong>Clipboard errors</strong>: Some browsers require user interaction for <code>Copy Center</code>; the plugin falls back to a prompt.</li>
+</ul>
+
+<h3 id="debugging">Debugging</h3>
+
+<p>Toggle <code>show_coords=&quot;true&quot;</code> or inspect <code>window.svgViewerInstances['viewer-id']</code> to troubleshoot zoom, center, or scroll behaviour.</p>
+
+<hr />
+
+<h2 id="changeloghighlights1.0.1">Changelog Highlights (1.0.1)</h2>
+
+<ul>
+<li><strong>Visual Preset Editor</strong>: Upload SVGs, configure zoom/center, style controls, and copy shortcodes without touching code.</li>
+<li><strong>Font Awesome Icons</strong>: Control buttons use embeddable SVG glyphs for crisp rendering.</li>
+<li><strong>Alignment Keywords</strong>: <code>alignleft</code>, <code>aligncenter</code>, <code>alignright</code> control button placement independently from bar position.</li>
+<li><strong>Vertical Layout Improvements</strong>: Left/right control stacks get proper spacing and alignment.</li>
+<li><strong>Sanitized Inline SVG</strong>: All icons pass through <code>wp_kses</code> to keep output safe.</li>
+</ul>
+
+<p>Full changelog lives in the repository’s <code>CHANGELOG.md</code>.</p>
+
+<hr />
+
+<h2 id="licensecredits">License &amp; Credits</h2>
+
+<ul>
+<li>License: GPL-2.0 (same as WordPress).</li>
+<li>Built to make large interactive diagrams pleasant to navigate inside WordPress.</li>
+</ul>

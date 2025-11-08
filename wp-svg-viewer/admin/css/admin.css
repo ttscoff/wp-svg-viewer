@@ -1,3 +1,75 @@
+.svg-viewer-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.svg-viewer-tab-nav {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #dcdcde;
+}
+
+.svg-viewer-tab-button {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-bottom: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #2c3338;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  font-weight: 500;
+}
+
+.svg-viewer-tab-button.is-active {
+  background: #fff;
+  color: #1d2327;
+  font-weight: 600;
+}
+
+.svg-viewer-tab-button:focus {
+  outline: 2px solid #2271b1;
+  outline-offset: 1px;
+}
+
+.svg-viewer-tab-panels {
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #fff;
+  padding: 20px;
+}
+
+.svg-viewer-tab-panel {
+  display: none;
+}
+
+.svg-viewer-tab-panel.is-active {
+  display: block;
+}
+
+.svg-viewer-help-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.svg-viewer-help-content table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.svg-viewer-help-content table,
+.svg-viewer-help-content th,
+.svg-viewer-help-content td {
+  border: 1px solid #dcdcde;
+}
+
+.svg-viewer-help-content th,
+.svg-viewer-help-content td {
+  padding: 8px;
+  text-align: left;
+}
+
 .svg-viewer-admin-meta {
   display: flex;
   flex-direction: column;

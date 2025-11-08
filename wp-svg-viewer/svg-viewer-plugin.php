@@ -34,6 +34,7 @@ class SVG_Viewer
         'svg_viewer_controls_position' => '_svg_controls_position',
         'svg_viewer_controls_buttons' => '_svg_controls_buttons',
     );
+    private $current_presets_admin_tab = null;
 
     public static function get_instance()
     {
@@ -45,6 +46,7 @@ class SVG_Viewer
 
     public function __construct()
     {
+        add_action('plugins_loaded', array($this, 'load_textdomain'));
         add_shortcode('svg_viewer', array($this, 'render_shortcode'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
         add_filter('upload_mimes', array($this, 'svg_use_mimetypes'));
@@ -54,6 +56,168 @@ class SVG_Viewer
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         add_filter('manage_svg_viewer_preset_posts_columns', array($this, 'add_shortcode_column'));
         add_action('manage_svg_viewer_preset_posts_custom_column', array($this, 'render_shortcode_column'), 10, 2);
+        add_action('current_screen', array($this, 'maybe_setup_presets_screen'));
+    }
+
+    /**
+     * Load plugin textdomain for translations
+     */
+    public function load_textdomain()
+    {
+        load_plugin_textdomain('svg-viewer', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    }
+
+    /**
+     * Initialize the presets screen tab navigation.
+     *
+     * @param WP_Screen $screen
+     * @return void
+     */
+    public function maybe_setup_presets_screen($screen)
+    {
+        if (!$screen || $screen->id !== 'edit-svg_viewer_preset') {
+            return;
+        }
+
+        $allowed_tabs = array('presets', 'help', 'changes');
+        $requested_tab = isset($_GET['svg_tab']) ? sanitize_key(wp_unslash($_GET['svg_tab'])) : 'presets'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+        if (!in_array($requested_tab, $allowed_tabs, true)) {
+            $requested_tab = 'presets';
+        }
+
+        $this->current_presets_admin_tab = $requested_tab;
+
+        add_action('in_admin_header', array($this, 'render_presets_screen_tabs_nav'));
+        add_action('all_admin_notices', array($this, 'render_presets_screen_tab_content'));
+
+        if ($requested_tab !== 'presets') {
+            add_action('admin_head', array($this, 'hide_presets_list_ui'));
+        }
+    }
+
+    /**
+     * Render the tab navigation on the presets list screen.
+     *
+     * @return void
+     */
+    public function render_presets_screen_tabs_nav()
+    {
+        if ($this->current_presets_admin_tab === null) {
+            return;
+        }
+
+        $base_url = add_query_arg('post_type', 'svg_viewer_preset', admin_url('edit.php'));
+        $tabs = array(
+            'presets' => __('Presets', 'svg-viewer'),
+            'help' => __('Help', 'svg-viewer'),
+            'changes' => __('Changes', 'svg-viewer'),
+        );
+
+        echo '<div class="svg-viewer-admin-screen-tabs nav-tab-wrapper">';
+
+        foreach ($tabs as $tab_key => $label) {
+            $url = $base_url;
+            if ($tab_key !== 'presets') {
+                $url = add_query_arg('svg_tab', $tab_key, $url);
+            } else {
+                $url = remove_query_arg('svg_tab', $url);
+            }
+
+            $is_active = $this->current_presets_admin_tab === $tab_key;
+            $classes = $is_active ? 'nav-tab nav-tab-active' : 'nav-tab';
+
+            printf(
+                '<a href="%1$s" class="%2$s" role="tab" aria-selected="%3$s">%4$s</a>',
+                esc_url($url),
+                esc_attr($classes),
+                $is_active ? 'true' : 'false',
+                esc_html($label)
+            );
+        }
+
+        echo '</div>';
+    }
+
+    /**
+     * Render the active tab content on the presets list screen.
+     *
+     * @return void
+     */
+    public function render_presets_screen_tab_content()
+    {
+        if ($this->current_presets_admin_tab === null || $this->current_presets_admin_tab === 'presets') {
+            return;
+        }
+
+        echo '<div class="svg-viewer-admin-screen-panel">';
+
+        if ($this->current_presets_admin_tab === 'help') {
+            $help_markup = $this->get_admin_help_markup();
+            if ($help_markup !== '') {
+                echo $help_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            } else {
+                printf('<p>%s</p>', esc_html__('Help content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'svg-viewer'));
+            }
+        } elseif ($this->current_presets_admin_tab === 'changes') {
+            $changelog_markup = $this->get_admin_changelog_markup();
+            if ($changelog_markup !== '') {
+                echo $changelog_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            } else {
+                printf('<p>%s</p>', esc_html__('Changes content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'svg-viewer'));
+            }
+        }
+
+        echo '</div>';
+    }
+
+    /**
+     * Hide the default list table UI when non-preset tabs are active.
+     *
+     * @return void
+     */
+    public function hide_presets_list_ui()
+    {
+        if ($this->current_presets_admin_tab === null || $this->current_presets_admin_tab === 'presets') {
+            return;
+        }
+        ?>
+        <style>
+            .post-type-svg_viewer_preset .wrap .tablenav,
+            .post-type-svg_viewer_preset .wrap .wp-list-table,
+            .post-type-svg_viewer_preset .wrap .subsubsub,
+            .post-type-svg_viewer_preset .wrap .search-box,
+            .post-type-svg_viewer_preset .wrap .tablenav.bottom,
+            .post-type-svg_viewer_preset .wrap .wp-heading-inline,
+            .post-type-svg_viewer_preset .wrap .page-title-action,
+            .post-type-svg_viewer_preset .wrap .alignleft.actions,
+            .post-type-svg_viewer_preset .wrap .tablenav-pages,
+            #screen-options-link-wrap,
+            #contextual-help-link {
+                display: none !important;
+            }
+
+            .svg-viewer-admin-screen-panel {
+                margin-top: 20px;
+                background: #fff;
+                padding: 20px;
+                border: 1px solid #dcdcde;
+                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+            }
+
+            .svg-viewer-admin-screen-panel table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .svg-viewer-admin-screen-panel th,
+            .svg-viewer-admin-screen-panel td {
+                border: 1px solid #dcdcde;
+                padding: 8px;
+                text-align: left;
+            }
+        </style>
+        <?php
     }
 
     /**
@@ -123,7 +287,16 @@ class SVG_Viewer
             $preset_data = $this->get_preset_settings($preset_id);
 
             if (!$preset_data) {
-                return '<div style="color: red; padding: 10px; border: 1px solid red;">Error: SVG preset not found for ID ' . esc_html($atts['id']) . '.</div>';
+                $error_message = sprintf(
+                    '<div style="color: red; padding: 10px; border: 1px solid red;">%s</div>',
+                    esc_html(
+                        sprintf(
+                            __('Error: SVG preset not found for ID %s.', 'svg-viewer'),
+                            $atts['id']
+                        )
+                    )
+                );
+                return $error_message;
             }
 
             foreach ($preset_data as $key => $value) {
@@ -149,14 +322,25 @@ class SVG_Viewer
 
         // Validate src
         if (empty($atts['src'])) {
-            return '<div style="color: red; padding: 10px; border: 1px solid red;">Error: SVG source not specified. Use [svg_viewer src="path/to/file.svg"]</div>';
+            $error_message = sprintf(
+                '<div style="color: red; padding: 10px; border: 1px solid red;">%s</div>',
+                esc_html__(
+                    'Error: SVG source not specified. Use [svg_viewer src="path/to/file.svg"]',
+                    'svg-viewer'
+                )
+            );
+            return $error_message;
         }
 
         // Convert relative paths to absolute URLs
         $svg_url = $this->get_svg_url($atts['src']);
 
         if (!$svg_url) {
-            return '<div style="color: red; padding: 10px; border: 1px solid red;">Error: Invalid SVG path.</div>';
+            $error_message = sprintf(
+                '<div style="color: red; padding: 10px; border: 1px solid red;">%s</div>',
+                esc_html__('Error: Invalid SVG path.', 'svg-viewer')
+            );
+            return $error_message;
         }
 
         // Normalize zoom settings
@@ -480,145 +664,297 @@ class SVG_Viewer
 
         $wrapper_class_attribute = $this->build_class_attribute($wrapper_classes);
         $main_class_attribute = $this->build_class_attribute($main_classes);
+        $settings_panel_id = $viewer_id . '-tab-settings';
+        $help_panel_id = $viewer_id . '-tab-help';
+        $changes_panel_id = $viewer_id . '-tab-changes';
         ?>
-        <div class="svg-viewer-admin-meta" data-viewer-id="<?php echo esc_attr($viewer_id); ?>">
-            <div class="svg-viewer-shortcode-display">
-                <label for="svg-viewer-shortcode"><?php esc_html_e('Preset Shortcode', 'svg-viewer'); ?></label>
-                <div class="svg-shortcode-wrap">
-                    <input type="text" id="svg-viewer-shortcode" class="svg-shortcode-input" readonly
-                        value="<?php echo esc_attr($shortcode); ?>">
-                    <button type="button" class="button svg-shortcode-copy"
-                        data-shortcode="<?php echo esc_attr($shortcode); ?>">
-                        <?php esc_html_e('Copy', 'svg-viewer'); ?>
-                    </button>
-                    <span class="svg-shortcode-status" aria-live="polite"></span>
-                </div>
-                <p class="description">
-                    <?php esc_html_e('Use this shortcode in pages or posts to embed this preset.', 'svg-viewer'); ?>
-                </p>
+        <div class="svg-viewer-tabs" data-viewer-id="<?php echo esc_attr($viewer_id); ?>">
+            <div class="svg-viewer-tab-nav" role="tablist">
+                <button type="button" class="svg-viewer-tab-button is-active" role="tab"
+                    id="<?php echo esc_attr($settings_panel_id); ?>-tab"
+                    aria-controls="<?php echo esc_attr($settings_panel_id); ?>" aria-selected="true" data-tab-target="settings">
+                    <?php esc_html_e('Settings', 'svg-viewer'); ?>
+                </button>
+                <button type="button" class="svg-viewer-tab-button" role="tab" id="<?php echo esc_attr($help_panel_id); ?>-tab"
+                    aria-controls="<?php echo esc_attr($help_panel_id); ?>" aria-selected="false" data-tab-target="help">
+                    <?php esc_html_e('Help', 'svg-viewer'); ?>
+                </button>
+                <button type="button" class="svg-viewer-tab-button" role="tab"
+                    id="<?php echo esc_attr($changes_panel_id); ?>-tab"
+                    aria-controls="<?php echo esc_attr($changes_panel_id); ?>" aria-selected="false" data-tab-target="changes">
+                    <?php esc_html_e('Changes', 'svg-viewer'); ?>
+                </button>
             </div>
+            <div class="svg-viewer-tab-panels">
+                <div class="svg-viewer-tab-panel is-active" role="tabpanel" id="<?php echo esc_attr($settings_panel_id); ?>"
+                    aria-labelledby="<?php echo esc_attr($settings_panel_id); ?>-tab" data-tab-panel="settings">
+                    <div class="svg-viewer-admin-meta" data-viewer-id="<?php echo esc_attr($viewer_id); ?>">
+                        <div class="svg-viewer-shortcode-display">
+                            <label for="svg-viewer-shortcode"><?php esc_html_e('Preset Shortcode', 'svg-viewer'); ?></label>
+                            <div class="svg-shortcode-wrap">
+                                <input type="text" id="svg-viewer-shortcode" class="svg-shortcode-input" readonly
+                                    value="<?php echo esc_attr($shortcode); ?>">
+                                <button type="button" class="button svg-shortcode-copy"
+                                    data-shortcode="<?php echo esc_attr($shortcode); ?>">
+                                    <?php esc_html_e('Copy', 'svg-viewer'); ?>
+                                </button>
+                                <span class="svg-shortcode-status" aria-live="polite"></span>
+                            </div>
+                            <p class="description">
+                                <?php esc_html_e('Use this shortcode in pages or posts to embed this preset.', 'svg-viewer'); ?>
+                            </p>
+                        </div>
 
-            <div class="svg-viewer-field">
-                <label for="svg-viewer-src"><?php esc_html_e('SVG Source URL', 'svg-viewer'); ?></label>
-                <div class="svg-viewer-media-control">
-                    <input type="text" id="svg-viewer-src" name="svg_viewer_src" value="<?php echo esc_attr($values['src']); ?>"
-                        placeholder="<?php esc_attr_e('https://example.com/my-graphic.svg or uploads/2025/graphic.svg', 'svg-viewer'); ?>" />
-                    <button type="button"
-                        class="button svg-viewer-select-media"><?php esc_html_e('Select SVG', 'svg-viewer'); ?></button>
-                </div>
-                <input type="hidden" name="svg_viewer_attachment_id"
-                    value="<?php echo esc_attr($values['attachment_id']); ?>" />
-            </div>
+                        <div class="svg-viewer-field">
+                            <label for="svg-viewer-src"><?php esc_html_e('SVG Source URL', 'svg-viewer'); ?></label>
+                            <div class="svg-viewer-media-control">
+                                <input type="text" id="svg-viewer-src" name="svg_viewer_src"
+                                    value="<?php echo esc_attr($values['src']); ?>"
+                                    placeholder="<?php esc_attr_e('https://example.com/my-graphic.svg or uploads/2025/graphic.svg', 'svg-viewer'); ?>" />
+                                <button type="button"
+                                    class="button svg-viewer-select-media"><?php esc_html_e('Select SVG', 'svg-viewer'); ?></button>
+                            </div>
+                            <input type="hidden" name="svg_viewer_attachment_id"
+                                value="<?php echo esc_attr($values['attachment_id']); ?>" />
+                        </div>
 
-            <div class="svg-viewer-field-group">
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-height"><?php esc_html_e('Viewer Height', 'svg-viewer'); ?></label>
-                    <input type="text" id="svg-viewer-height" name="svg_viewer_height"
-                        value="<?php echo esc_attr($values['height']); ?>" placeholder="600px" />
-                </div>
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-min-zoom"><?php esc_html_e('Min Zoom (%)', 'svg-viewer'); ?></label>
-                    <input type="number" id="svg-viewer-min-zoom" name="svg_viewer_min_zoom"
-                        value="<?php echo esc_attr($values['min_zoom']); ?>" min="1" step="1" />
-                </div>
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-max-zoom"><?php esc_html_e('Max Zoom (%)', 'svg-viewer'); ?></label>
-                    <input type="number" id="svg-viewer-max-zoom" name="svg_viewer_max_zoom"
-                        value="<?php echo esc_attr($values['max_zoom']); ?>" min="1" step="1" />
-                </div>
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'svg-viewer'); ?></label>
-                    <input type="number" id="svg-viewer-initial-zoom" name="svg_viewer_initial_zoom"
-                        value="<?php echo esc_attr($values['initial_zoom']); ?>" min="1" step="1" />
-                </div>
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'svg-viewer'); ?></label>
-                    <input type="number" id="svg-viewer-zoom-step" name="svg_viewer_zoom_step"
-                        value="<?php echo esc_attr($values['zoom_step']); ?>" min="0.1" step="0.1" />
-                </div>
-            </div>
+                        <div class="svg-viewer-field-group">
+                            <div class="svg-viewer-field">
+                                <label for="svg-viewer-height"><?php esc_html_e('Viewer Height', 'svg-viewer'); ?></label>
+                                <input type="text" id="svg-viewer-height" name="svg_viewer_height"
+                                    value="<?php echo esc_attr($values['height']); ?>" placeholder="600px" />
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label for="svg-viewer-min-zoom"><?php esc_html_e('Min Zoom (%)', 'svg-viewer'); ?></label>
+                                <input type="number" id="svg-viewer-min-zoom" name="svg_viewer_min_zoom"
+                                    value="<?php echo esc_attr($values['min_zoom']); ?>" min="1" step="1" />
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label for="svg-viewer-max-zoom"><?php esc_html_e('Max Zoom (%)', 'svg-viewer'); ?></label>
+                                <input type="number" id="svg-viewer-max-zoom" name="svg_viewer_max_zoom"
+                                    value="<?php echo esc_attr($values['max_zoom']); ?>" min="1" step="1" />
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label
+                                    for="svg-viewer-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'svg-viewer'); ?></label>
+                                <input type="number" id="svg-viewer-initial-zoom" name="svg_viewer_initial_zoom"
+                                    value="<?php echo esc_attr($values['initial_zoom']); ?>" min="1" step="1" />
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label
+                                    for="svg-viewer-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'svg-viewer'); ?></label>
+                                <input type="number" id="svg-viewer-zoom-step" name="svg_viewer_zoom_step"
+                                    value="<?php echo esc_attr($values['zoom_step']); ?>" min="0.1" step="0.1" />
+                            </div>
+                        </div>
 
-            <div class="svg-viewer-field-group">
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-center-x"><?php esc_html_e('Center X', 'svg-viewer'); ?></label>
-                    <input type="number" id="svg-viewer-center-x" name="svg_viewer_center_x"
-                        value="<?php echo esc_attr($values['center_x']); ?>" step="0.01" />
-                </div>
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-center-y"><?php esc_html_e('Center Y', 'svg-viewer'); ?></label>
-                    <input type="number" id="svg-viewer-center-y" name="svg_viewer_center_y"
-                        value="<?php echo esc_attr($values['center_y']); ?>" step="0.01" />
-                </div>
-            </div>
+                        <div class="svg-viewer-field-group">
+                            <div class="svg-viewer-field">
+                                <label for="svg-viewer-center-x"><?php esc_html_e('Center X', 'svg-viewer'); ?></label>
+                                <input type="number" id="svg-viewer-center-x" name="svg_viewer_center_x"
+                                    value="<?php echo esc_attr($values['center_x']); ?>" step="0.01" />
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label for="svg-viewer-center-y"><?php esc_html_e('Center Y', 'svg-viewer'); ?></label>
+                                <input type="number" id="svg-viewer-center-y" name="svg_viewer_center_y"
+                                    value="<?php echo esc_attr($values['center_y']); ?>" step="0.01" />
+                            </div>
+                        </div>
 
-            <div class="svg-viewer-field-group">
-                <div class="svg-viewer-field">
-                    <label for="svg-viewer-controls-position"><?php esc_html_e('Controls Position', 'svg-viewer'); ?></label>
-                    <select id="svg-viewer-controls-position" name="svg_viewer_controls_position">
-                        <?php
-                        $positions_options = array(
-                            'top' => __('Top', 'svg-viewer'),
-                            'bottom' => __('Bottom', 'svg-viewer'),
-                            'left' => __('Left', 'svg-viewer'),
-                            'right' => __('Right', 'svg-viewer'),
-                        );
-                        foreach ($positions_options as $pos_value => $label):
-                            ?>
-                            <option value="<?php echo esc_attr($pos_value); ?>" <?php selected($values['controls_position'], $pos_value); ?>>
-                                <?php echo esc_html($label); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="svg-viewer-field">
-                    <label
-                        for="svg-viewer-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'svg-viewer'); ?></label>
-                    <input type="text" id="svg-viewer-controls-buttons" name="svg_viewer_controls_buttons"
-                        value="<?php echo esc_attr($values['controls_buttons']); ?>" placeholder="both" />
-                    <p class="description">
-                        <?php esc_html_e('Examples: both, icon, compact, minimal, icon,zoom_in,zoom_out,center', 'svg-viewer'); ?>
-                    </p>
-                </div>
-            </div>
+                        <div class="svg-viewer-field-group">
+                            <div class="svg-viewer-field">
+                                <label
+                                    for="svg-viewer-controls-position"><?php esc_html_e('Controls Position', 'svg-viewer'); ?></label>
+                                <select id="svg-viewer-controls-position" name="svg_viewer_controls_position">
+                                    <?php
+                                    $positions_options = array(
+                                        'top' => __('Top', 'svg-viewer'),
+                                        'bottom' => __('Bottom', 'svg-viewer'),
+                                        'left' => __('Left', 'svg-viewer'),
+                                        'right' => __('Right', 'svg-viewer'),
+                                    );
+                                    foreach ($positions_options as $pos_value => $label):
+                                        ?>
+                                        <option value="<?php echo esc_attr($pos_value); ?>" <?php selected($values['controls_position'], $pos_value); ?>>
+                                            <?php echo esc_html($label); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label
+                                    for="svg-viewer-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'svg-viewer'); ?></label>
+                                <input type="text" id="svg-viewer-controls-buttons" name="svg_viewer_controls_buttons"
+                                    value="<?php echo esc_attr($values['controls_buttons']); ?>" placeholder="both" />
+                                <p class="description">
+                                    <?php esc_html_e('Combine multiple options with commas. Examples: both, icon, text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords', 'svg-viewer'); ?>
+                                </p>
+                            </div>
+                        </div>
 
-            <div class="svg-viewer-field">
-                <label for="svg-viewer-title"><?php esc_html_e('Title (optional)', 'svg-viewer'); ?></label>
-                <input type="text" id="svg-viewer-title" name="svg_viewer_title"
-                    value="<?php echo esc_attr($values['title']); ?>" />
-            </div>
+                        <div class="svg-viewer-field">
+                            <label for="svg-viewer-title"><?php esc_html_e('Title (optional)', 'svg-viewer'); ?></label>
+                            <input type="text" id="svg-viewer-title" name="svg_viewer_title"
+                                value="<?php echo esc_attr($values['title']); ?>" />
+                        </div>
 
-            <div class="svg-viewer-field">
-                <label for="svg-viewer-caption"><?php esc_html_e('Caption (optional)', 'svg-viewer'); ?></label>
-                <textarea id="svg-viewer-caption" name="svg_viewer_caption" rows="3"
-                    class="widefat"><?php echo esc_textarea($values['caption']); ?></textarea>
-                <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'svg-viewer'); ?></p>
-            </div>
+                        <div class="svg-viewer-field">
+                            <label for="svg-viewer-caption"><?php esc_html_e('Caption (optional)', 'svg-viewer'); ?></label>
+                            <textarea id="svg-viewer-caption" name="svg_viewer_caption" rows="3"
+                                class="widefat"><?php echo esc_textarea($values['caption']); ?></textarea>
+                            <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'svg-viewer'); ?></p>
+                        </div>
 
-            <div class="svg-viewer-admin-preview">
-                <div class="svg-viewer-admin-preview-toolbar">
-                    <button type="button" class="button svg-admin-refresh-preview"
-                        data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Load / Refresh Preview', 'svg-viewer'); ?></button>
-                    <button type="button" class="button button-primary svg-admin-capture-state"
-                        data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Use Current View for Initial State', 'svg-viewer'); ?></button>
-                    <span class="svg-admin-status" aria-live="polite"></span>
-                </div>
-                <div class="<?php echo esc_attr($wrapper_class_attribute); ?>" id="<?php echo esc_attr($viewer_id); ?>">
-                    <div class="svg-viewer-title js-admin-title" hidden></div>
-                    <div class="<?php echo esc_attr($main_class_attribute); ?>"
-                        data-viewer="<?php echo esc_attr($viewer_id); ?>">
-                        <?php if ($preview_controls_markup !== ''): ?>
-                            <?php echo $preview_controls_markup; ?>
-                        <?php endif; ?>
-                        <div class="svg-container" data-viewer="<?php echo esc_attr($viewer_id); ?>"
-                            style="height: <?php echo esc_attr($values['height']); ?>">
-                            <div class="svg-viewport" data-viewer="<?php echo esc_attr($viewer_id); ?>"></div>
+                        <div class="svg-viewer-admin-preview">
+                            <div class="svg-viewer-admin-preview-toolbar">
+                                <button type="button" class="button svg-admin-refresh-preview"
+                                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Load / Refresh Preview', 'svg-viewer'); ?></button>
+                                <button type="button" class="button button-primary svg-admin-capture-state"
+                                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Use Current View for Initial State', 'svg-viewer'); ?></button>
+                                <span class="svg-admin-status" aria-live="polite"></span>
+                            </div>
+                            <div class="<?php echo esc_attr($wrapper_class_attribute); ?>"
+                                id="<?php echo esc_attr($viewer_id); ?>">
+                                <div class="svg-viewer-title js-admin-title" hidden></div>
+                                <div class="<?php echo esc_attr($main_class_attribute); ?>"
+                                    data-viewer="<?php echo esc_attr($viewer_id); ?>">
+                                    <?php if ($preview_controls_markup !== ''): ?>
+                                        <?php echo $preview_controls_markup; ?>
+                                    <?php endif; ?>
+                                    <div class="svg-container" data-viewer="<?php echo esc_attr($viewer_id); ?>"
+                                        style="height: <?php echo esc_attr($values['height']); ?>">
+                                        <div class="svg-viewport" data-viewer="<?php echo esc_attr($viewer_id); ?>"></div>
+                                    </div>
+                                </div>
+                                <div class="svg-viewer-caption js-admin-caption" hidden></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="svg-viewer-caption js-admin-caption" hidden></div>
+                </div>
+                <div class="svg-viewer-tab-panel" role="tabpanel" id="<?php echo esc_attr($help_panel_id); ?>"
+                    aria-labelledby="<?php echo esc_attr($help_panel_id); ?>-tab" data-tab-panel="help" aria-hidden="true">
+                    <div class="svg-viewer-help-content">
+                        <?php
+                        $help_markup = $this->get_admin_help_markup();
+                        if ($help_markup !== '') {
+                            echo $help_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        } else {
+                            printf('<p>%s</p>', esc_html__('Help content is not available. Run the "Render Help" build step to regenerate it.', 'svg-viewer'));
+                        }
+                        ?>
+                    </div>
+                </div>
+                <div class="svg-viewer-tab-panel" role="tabpanel" id="<?php echo esc_attr($changes_panel_id); ?>"
+                    aria-labelledby="<?php echo esc_attr($changes_panel_id); ?>-tab" data-tab-panel="changes"
+                    aria-hidden="true">
+                    <div class="svg-viewer-help-content">
+                        <?php
+                        $changelog_markup = $this->get_admin_changelog_markup();
+                        if ($changelog_markup !== '') {
+                            echo $changelog_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        } else {
+                            printf('<p>%s</p>', esc_html__('Changes content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'svg-viewer'));
+                        }
+                        ?>
+                    </div>
                 </div>
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Retrieve the pre-rendered admin help markup.
+     *
+     * @return string
+     */
+    private function get_admin_help_markup()
+    {
+        static $cached_markup = null;
+
+        if ($cached_markup !== null) {
+            return $cached_markup;
+        }
+
+        $help_file = plugin_dir_path(__FILE__) . 'admin/help.html';
+
+        if (!file_exists($help_file)) {
+            $cached_markup = '';
+            return $cached_markup;
+        }
+
+        $modified_time = (int) filemtime($help_file);
+        $transient_key = 'svg_viewer_help_markup';
+        $stored = get_transient($transient_key);
+
+        if (is_array($stored) && isset($stored['mtime'], $stored['html']) && (int) $stored['mtime'] === $modified_time) {
+            $cached_markup = $stored['html'];
+            return $cached_markup;
+        }
+
+        $raw_html = file_get_contents($help_file);
+
+        if ($raw_html === false) {
+            $cached_markup = '';
+            return $cached_markup;
+        }
+
+        $sanitized = wp_kses_post($raw_html);
+        $cached_markup = $sanitized;
+
+        set_transient($transient_key, array(
+            'mtime' => $modified_time,
+            'html' => $sanitized,
+        ), DAY_IN_SECONDS);
+
+        return $cached_markup;
+    }
+
+    /**
+     * Retrieve the pre-rendered admin changelog markup.
+     *
+     * @return string
+     */
+    private function get_admin_changelog_markup()
+    {
+        static $cached_changelog = null;
+
+        if ($cached_changelog !== null) {
+            return $cached_changelog;
+        }
+
+        $changelog_file = plugin_dir_path(__FILE__) . 'admin/changelog.html';
+
+        if (!file_exists($changelog_file)) {
+            $cached_changelog = '';
+            return $cached_changelog;
+        }
+
+        $modified_time = (int) filemtime($changelog_file);
+        $transient_key = 'svg_viewer_changelog_markup';
+        $stored = get_transient($transient_key);
+
+        if (is_array($stored) && isset($stored['mtime'], $stored['html']) && (int) $stored['mtime'] === $modified_time) {
+            $cached_changelog = $stored['html'];
+            return $cached_changelog;
+        }
+
+        $raw_html = file_get_contents($changelog_file);
+
+        if ($raw_html === false) {
+            $cached_changelog = '';
+            return $cached_changelog;
+        }
+
+        $sanitized = wp_kses_post($raw_html);
+        $cached_changelog = $sanitized;
+
+        set_transient($transient_key, array(
+            'mtime' => $modified_time,
+            'html' => $sanitized,
+        ), DAY_IN_SECONDS);
+
+        return $cached_changelog;
     }
 
     /**
