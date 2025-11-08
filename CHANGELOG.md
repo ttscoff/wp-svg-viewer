@@ -1,3 +1,11 @@
+### 1.0.6
+
+2025-11-08 10:35
+
+#### FIXED
+
+- CSS caching not keeping up with versions
+
 ### 1.0.5
 
 2025-11-08 10:13
