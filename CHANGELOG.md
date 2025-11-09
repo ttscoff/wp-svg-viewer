@@ -1,3 +1,11 @@
+### 1.0.9
+
+2025-11-09 11:20
+
+#### FIXED
+
+- Broken icon/button text after plugin submission fixes
+
 ### 1.0.8
 
 2025-11-09 10:33
