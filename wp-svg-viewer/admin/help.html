@@ -1,23 +1,33 @@
 <h1 id="wpsvgviewer">WP SVG Viewer</h1>
 
-<p>Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tools. Version 1.0.1 introduces a visual preset editor, icon-based controls, and deeper shortcode options.</p>
+<p>Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tools. Recent releases add a visual preset editor, icon-based controls, deeper shortcode options, and configurable button colors.</p>
 
 <hr />
 
 <h2 id="contents">Contents</h2>
 
-<ol>
+<ul>
+<li><a href="#contents">Contents</a></li>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#quick-start">Quick Start</a></li>
 <li><a href="#shortcode-reference">Shortcode Reference</a></li>
+<li> <a href="#controls_buttons-cheat-sheet"><code>controls_buttons</code> Cheat Sheet</a></li>
 <li><a href="#admin-preset-editor">Admin Preset Editor</a></li>
+<li> <a href="#location">Location</a></li>
+<li> <a href="#fields">Fields</a></li>
+<li> <a href="#preview-pane">Preview Pane</a></li>
+<li> <a href="#preset-shortcodes">Preset Shortcodes</a></li>
 <li><a href="#using-presets-in-postspages">Using Presets in Posts/Pages</a></li>
 <li><a href="#preview-workflow">Preview Workflow</a></li>
 <li><a href="#examples">Examples</a></li>
 <li><a href="#styling-css-hooks">Styling (CSS Hooks)</a></li>
 <li><a href="#tips--troubleshooting">Tips &amp; Troubleshooting</a></li>
-<li><a href="#changelog-highlights-101">Changelog Highlights</a></li>
-</ol>
+<li> <a href="#svg-preparation">SVG Preparation</a></li>
+<li> <a href="#common-issues">Common Issues</a></li>
+<li> <a href="#debugging">Debugging</a></li>
+<li><a href="#changelog-highlights-101">Changelog Highlights (1.0.1)</a></li>
+<li><a href="#license--credits">License &amp; Credits</a></li>
+</ul>
 
 <hr />
 
@@ -28,7 +38,7 @@
 </ol>
 
 <ul>
-<li> Download <code>wp-svg-viewer.zip</code>.</li>
+<li> Download <a href="github.com/ttscoff/wp-svg-viewer/releases/latest/download/wp-svg-viewer.zip">wp-svg-viewer.zip</a>.</li>
 <li> Unzip it locally; you will get a folder named <code>wp-svg-viewer</code>.</li>
 </ul>
 
@@ -45,7 +55,7 @@
 </ol>
 
 <ul>
-<li> In the WordPress admin, navigate to <strong>Plugins</strong> and click <strong>Activate</strong> on “SVG Viewer”.</li>
+<li> In the WordPress admin, navigate to <strong>Plugins</strong> and click <strong>Activate</strong> on ???SVG Viewer???.</li>
 </ul>
 
 <hr />
@@ -57,7 +67,7 @@
 
 <ul>
 <li>Place the shortcode in a classic editor, Gutenberg shortcode block, or template.</li>
-<li>The SVG renders with default height (600px), zoom controls, pan/scroll behaviour, keyboard shortcuts, and responsive layout.</li>
+<li>The SVG renders with default height (600px), zoom controls, pan/scroll behaviour, keyboard shortcuts, and responsive layout. Zoom buttons now gray out at the minimum/maximum zoom to make the limits obvious to visitors.</li>
 </ul>
 
 <hr />
@@ -74,100 +84,140 @@
 
 <thead>
 <tr>
-	<th> Attribute    </th>
-	<th> Type       </th>
-	<th> Default </th>
-	<th> Description                     </th>
+	<th> Attribute           </th>
+	<th> Type        </th>
+	<th> Default     </th>
+	<th> Description                                  </th>
 </tr>
 </thead>
 
 <tbody>
 <tr>
-	<td> <code>src</code>     </td>
-	<td> string (required)    </td>
-	<td> –  </td>
-	<td> SVG URL. Supports absolute URLs, <code>/absolute/path.svg</code>, or relative to the uploads directory. </td>
+	<td> <code>src</code>            </td>
+	<td> string (required)     </td>
+	<td> ???       </td>
+	<td> SVG URL. Supports absolute URLs, <code>/absolute/path.svg</code>, or relative to the uploads directory.              </td>
 </tr>
 <tr>
-	<td> <code>height</code>    </td>
-	<td> string      </td>
-	<td> <code>600px</code> </td>
-	<td> CSS height of the viewer. Accepts px, vh, %, etc.           </td>
+	<td> <code>height</code>           </td>
+	<td> string        </td>
+	<td> <code>600px</code>     </td>
+	<td> CSS height of the viewer. Accepts px, vh, %, etc.                        </td>
 </tr>
 <tr>
-	<td> <code>class</code>     </td>
-	<td> string      </td>
-	<td> –  </td>
-	<td> Additional class appended to the wrapper.             </td>
+	<td> <code>class</code>           </td>
+	<td> string        </td>
+	<td> ???       </td>
+	<td> Additional class appended to the wrapper.                          </td>
 </tr>
 <tr>
-	<td> <code>zoom</code>     </td>
-	<td> number      </td>
-	<td> <code>100</code> </td>
-	<td> Initial zoom percentage.                  </td>
+	<td> <code>zoom</code>            </td>
+	<td> number        </td>
+	<td> <code>100</code>      </td>
+	<td> Initial zoom percentage.                               </td>
 </tr>
 <tr>
-	<td> <code>min_zoom</code>    </td>
-	<td> number      </td>
-	<td> <code>25</code> </td>
-	<td> Minimum zoom percentage allowed.                </td>
+	<td> <code>min_zoom</code>           </td>
+	<td> number        </td>
+	<td> <code>25</code>      </td>
+	<td> Minimum zoom percentage allowed.                             </td>
 </tr>
 <tr>
-	<td> <code>max_zoom</code>    </td>
-	<td> number      </td>
-	<td> <code>800</code> </td>
-	<td> Maximum zoom percentage allowed.                </td>
+	<td> <code>max_zoom</code>           </td>
+	<td> number        </td>
+	<td> <code>800</code>      </td>
+	<td> Maximum zoom percentage allowed.                             </td>
 </tr>
 <tr>
-	<td> <code>zoom_step</code>    </td>
-	<td> number      </td>
-	<td> <code>10</code> </td>
-	<td> Increment used by buttons/keyboard shortcuts.            </td>
+	<td> <code>zoom_step</code>          </td>
+	<td> number        </td>
+	<td> <code>10</code>      </td>
+	<td> Increment used by buttons/keyboard shortcuts.                         </td>
 </tr>
 <tr>
-	<td> <code>center_x</code> / <code>center_y</code> </td>
-	<td> number      </td>
-	<td> –  </td>
-	<td> Manual center point in SVG units. Defaults to viewBox center.        </td>
+	<td> <code>initial_zoom</code>          </td>
+	<td> number        </td>
+	<td> ???       </td>
+	<td> Alias captured when presets save the preview state. Overrides <code>zoom</code> if present.                 </td>
 </tr>
 <tr>
-	<td> <code>show_coords</code>   </td>
-	<td> boolean      </td>
-	<td> <code>false</code> </td>
-	<td> Appends “Copy Center” button for debugging coordinate values.        </td>
+	<td> <code>pan</code> / <code>pan_mode</code>         </td>
+	<td> <code>scroll</code> or <code>drag</code>     </td>
+	<td> <code>scroll</code>     </td>
+	<td> Toggle between scroll-wheel panning and click-drag panning. Drag is enforced when zoom modes require it.           </td>
 </tr>
 <tr>
-	<td> <code>controls_position</code>  </td>
-	<td> <code>top</code>/<code>bottom</code>/<code>left</code>/<code>right</code> </td>
-	<td> <code>top</code> </td>
-	<td> Placement of the entire control group.              </td>
+	<td> <code>zoom_mode</code> / <code>zoom_behavior</code> / <code>zoom_interaction</code> </td>
+	<td> <code>super_scroll</code> / <code>scroll</code> / <code>click</code> </td>
+	<td> <code>super_scroll</code>   </td>
+	<td> Choose how wheel and modifier gestures zoom: Cmd/Ctrl + wheel (<code>super_scroll</code>), every wheel (<code>scroll</code>), or Cmd/Ctrl-click &amp; Alt-click (<code>click</code>). </td>
 </tr>
 <tr>
-	<td> <code>controls_buttons</code>  </td>
-	<td> string      </td>
-	<td> <code>both</code> </td>
-	<td> Comma-delimited mode/align/button list. See table below.          </td>
+	<td> <code>center_x</code> / <code>center_y</code>       </td>
+	<td> number        </td>
+	<td> ???       </td>
+	<td> Manual center point in SVG units. Defaults to viewBox center.                     </td>
 </tr>
 <tr>
-	<td> <code>title</code>     </td>
-	<td> string      </td>
-	<td> –  </td>
-	<td> Optional heading above the viewer. HTML allowed.            </td>
+	<td> <code>show_coords</code>          </td>
+	<td> boolean        </td>
+	<td> <code>false</code>     </td>
+	<td> Appends ???Copy Center??? button for debugging coordinate values.                     </td>
 </tr>
 <tr>
-	<td> <code>caption</code>    </td>
-	<td> string      </td>
-	<td> –  </td>
-	<td> Optional caption below the viewer. HTML allowed.            </td>
+	<td> <code>controls_position</code>        </td>
+	<td> <code>top</code>/<code>bottom</code>/<code>left</code>/<code>right</code>  </td>
+	<td> <code>top</code>      </td>
+	<td> Placement of the entire control group.                           </td>
 </tr>
 <tr>
-	<td> <code>id</code>     </td>
-	<td> number      </td>
-	<td> –  </td>
-	<td> Reference a saved preset (admin). Inline attributes override preset values.     </td>
+	<td> <code>controls_buttons</code>         </td>
+	<td> string        </td>
+	<td> <code>both</code>     </td>
+	<td> Comma-delimited mode/align/button list. See table below (supports <code>slider</code>).                  </td>
+</tr>
+<tr>
+	<td> <code>title</code>           </td>
+	<td> string        </td>
+	<td> ???       </td>
+	<td> Optional heading above the viewer. HTML allowed.                         </td>
+</tr>
+<tr>
+	<td> <code>caption</code>           </td>
+	<td> string        </td>
+	<td> ???       </td>
+	<td> Optional caption below the viewer. HTML allowed.                         </td>
+</tr>
+<tr>
+	<td> <code>button_fill</code> / <code>button_background</code> / <code>button_bg</code> </td>
+	<td> color string      </td>
+	<td> theme default (<code>#0073aa</code>) </td>
+	<td> Button background color. Aliases exist for backwards compatibility (all map to <code>button_fill</code>).             </td>
+</tr>
+<tr>
+	<td> <code>button_border</code>         </td>
+	<td> color string      </td>
+	<td> matches fill    </td>
+	<td> Outline color for buttons. Blank inherits the fill color.                      </td>
+</tr>
+<tr>
+	<td> <code>button_foreground</code> / <code>button_fg</code>     </td>
+	<td> color string      </td>
+	<td> <code>#ffffff</code>     </td>
+	<td> Text and icon color for buttons. Blank uses the default.                       </td>
+</tr>
+<tr>
+	<td> <code>id</code>            </td>
+	<td> number        </td>
+	<td> ???       </td>
+	<td> Reference a saved preset (admin). Inline attributes override preset values.                  </td>
 </tr>
 </tbody>
 </table>
+
+<blockquote>
+<p>Changing the interaction defaults automatically inserts a helper caption (e.g. ???Cmd/Ctrl-click to zoom in??????) above your custom caption so visitors know the gesture.</p>
+</blockquote>
 
 <h3 id="controls_buttonscheatsheet"><code>controls_buttons</code> Cheat Sheet</h3>
 
@@ -194,6 +244,12 @@
 <li><code>alignright</code></li>
 </ul>
 
+<p>Additional keywords:</p>
+
+<ul>
+<li><code>slider</code> ??? replaces zoom buttons with a live-updating range input. Combine with <code>icon</code>/<code>text</code>/<code>both</code> for layout. Use <code>custom:slider,zoom_in,zoom_out</code> to show both slider and buttons.</li>
+</ul>
+
 <p>Button names (pick any order):</p>
 
 <ul>
@@ -205,7 +261,7 @@
 <pre><code class="text">[svg_viewer
   src=&quot;/uploads/system-map.svg&quot;
   controls_position=&quot;right&quot;
-  controls_buttons=&quot;icon,aligncenter,zoom_in,zoom_out,reset,center&quot;
+  controls_buttons=&quot;slider,icon,aligncenter,reset,center&quot;
 ]
 </code></pre>
 
@@ -215,7 +271,7 @@
 
 <h3 id="location">Location</h3>
 
-<p><code>WordPress Dashboard → SVG Viewer → Presets</code></p>
+<p><code>WordPress Dashboard ??? SVG Viewer ??? Presets</code></p>
 
 <h3 id="fields">Fields</h3>
 
@@ -255,7 +311,11 @@
 </tr>
 <tr>
 	<td> <strong>Controls Buttons/Layout</strong> </td>
-	<td> Text field following the <code>MODE,ALIGN,buttons…</code> pattern described above.  </td>
+	<td> Text field following the <code>MODE,ALIGN,buttons???</code> pattern described above.  </td>
+</tr>
+<tr>
+	<td> <strong>Button Colors</strong>   </td>
+	<td> Three color pickers for fill, border, and foreground (text/icon) colors.  </td>
 </tr>
 <tr>
 	<td> <strong>Title &amp; Caption</strong>   </td>
@@ -270,13 +330,21 @@
 <li><strong>Load / Refresh Preview</strong>: Injects the SVG using the current field values.</li>
 <li><strong>Use Current View for Initial State</strong>: Captures the visible zoom level and center point from the preview and writes them back into the form (ideal for fine-tuning coordinates visually).</li>
 <li><strong>Copy Center</strong>: When <code>show_coords</code> is enabled, the button copies coordinates to the clipboard.</li>
+<li>Zoom controls in the preview (and front end) now snap to their minimum/maximum, disable the corresponding buttons, and keep your pointer-focused zoom locked to the selected point???what you see in the preview is exactly what site visitors experience.</li>
 </ul>
 
 <h3 id="presetshortcodes">Preset Shortcodes</h3>
 
 <ul>
-<li>At the top of the preset editor and in the presets list table you’ll find a copy-ready snippet in the form of <code>[svg_viewer id=&quot;123&quot;]</code>.</li>
+<li>At the top of the preset editor and in the presets list table you???ll find a copy-ready snippet in the form of <code>[svg_viewer id=&quot;123&quot;]</code>.</li>
 <li>Click <strong>Copy</strong> to put the shortcode on the clipboard without selecting manually.</li>
+</ul>
+
+<h3 id="defaultstab">Defaults Tab</h3>
+
+<ul>
+<li>Visit <strong>SVG Viewer ??? Presets ??? Defaults</strong> to seed the fields used when creating a new preset.</li>
+<li>The panel now includes <strong>Enable asset cache busting for debugging</strong>, which appends a time-based suffix to scripts and styles. It is automatically active on hosts that start with <code>dev.</code> or <code>wptest.</code> and can be toggled manually when you need to defeat browser caching.</li>
 </ul>
 
 <hr />
@@ -335,7 +403,7 @@
 
 <pre><code class="text">[svg_viewer
   id=&quot;42&quot;
-  controls_buttons=&quot;icon,alignright,zoom_in,zoom_out&quot;
+  controls_buttons=&quot;custom:slider,zoom_in,zoom_out,reset&quot;
 ]
 </code></pre>
 
@@ -346,6 +414,15 @@
 ]
 </code></pre>
 
+<pre><code class="text">[svg_viewer
+  src=&quot;/uploads/campus-map.svg&quot;
+  button_bg=&quot;#2f855a&quot;
+  button_border=&quot;#22543d&quot;
+  button_fg=&quot;#ffffff&quot;
+  controls_buttons=&quot;both,aligncenter,zoom_in,zoom_out,reset,center&quot;
+]
+</code></pre>
+
 <hr />
 
 <h2 id="stylingcsshooks">Styling (CSS Hooks)</h2>
@@ -353,15 +430,27 @@
 <p>Wrapper classes added by the plugin:</p>
 
 <ul>
-<li><code>.svg-viewer-wrapper</code> – outer container</li>
-<li><code>.svg-viewer-main</code> – wraps controls and SVG container</li>
-<li><code>.svg-controls</code> – control bar</li>
+<li><code>.svg-viewer-wrapper</code> ??? outer container</li>
+<li><code>.svg-viewer-main</code> ??? wraps controls and SVG container</li>
+<li><code>.svg-controls</code> ??? control bar</li>
 <li><code>.controls-position-{top|bottom|left|right}</code></li>
 <li><code>.controls-mode-{icon|text|both|compact|labels-on-hover|minimal}</code></li>
 <li><code>.controls-align-{alignleft|aligncenter|alignright}</code></li>
 <li><code>.svg-viewer-btn</code>, <code>.btn-icon</code>, <code>.btn-text</code></li>
 <li><code>.svg-container</code>, <code>.svg-viewport</code>, <code>.coord-output</code>, <code>.zoom-display</code></li>
+<li><code>.zoom-slider-wrapper</code>, <code>.zoom-slider</code></li>
 </ul>
+
+<p>Button colors are powered by CSS custom properties on the wrapper. Shortcode attributes and preset color pickers set these values, but you can override them manually:</p>
+
+<pre><code class="css">.svg-viewer-wrapper {
+  --svg-viewer-button-fill: #1d4ed8;
+  --svg-viewer-button-border: #1d4ed8;
+  --svg-viewer-button-hover: #1e40af;
+  --svg-viewer-button-text: #ffffff;
+  --svg-viewer-slider-width: 240px;       /* optional: tweak slider width */
+}
+</code></pre>
 
 <p>Example overrides:</p>
 
@@ -409,21 +498,23 @@
 
 <h3 id="debugging">Debugging</h3>
 
-<p>Toggle <code>show_coords=&quot;true&quot;</code> or inspect <code>window.svgViewerInstances['viewer-id']</code> to troubleshoot zoom, center, or scroll behaviour.</p>
+<ul>
+<li>Toggle <code>show_coords=&quot;true&quot;</code> or inspect <code>window.svgViewerInstances['viewer-id']</code> to troubleshoot zoom, center, or scroll behaviour.</li>
+<li>Use the Defaults tab???s <strong>Enable asset cache busting for debugging</strong> switch if your browser clings to stale copies of the viewer script or styles.</li>
+</ul>
 
 <hr />
 
-<h2 id="changeloghighlights1.0.1">Changelog Highlights (1.0.1)</h2>
+<h2 id="changeloghighlights1.1.0">Changelog Highlights (1.1.0)</h2>
 
 <ul>
-<li><strong>Visual Preset Editor</strong>: Upload SVGs, configure zoom/center, style controls, and copy shortcodes without touching code.</li>
-<li><strong>Font Awesome Icons</strong>: Control buttons use embeddable SVG glyphs for crisp rendering.</li>
-<li><strong>Alignment Keywords</strong>: <code>alignleft</code>, <code>aligncenter</code>, <code>alignright</code> control button placement independently from bar position.</li>
-<li><strong>Vertical Layout Improvements</strong>: Left/right control stacks get proper spacing and alignment.</li>
-<li><strong>Sanitized Inline SVG</strong>: All icons pass through <code>wp_kses</code> to keep output safe.</li>
+<li><strong>Pan/Zoom Interaction Modes</strong>: Shortcode and presets can now request <code>pan_mode=&quot;drag&quot;</code> or <code>zoom_mode=&quot;scroll&quot;</code> / <code>click&quot;</code>, with the front end auto-explaining gesture hints to visitors.</li>
+<li><strong>Smooth Cursor-Focused Zoom</strong>: Wheel, slider, and modifier-click zoom animate between stops and keep the point under the pointer locked in place.</li>
+<li><strong>Responsive Drag Panning</strong>: Dragging now tracks 1:1 with the pointer and ignores stray wheel events so diagonal swipes stay fluid.</li>
+<li><strong>Dev-Friendly Cache Busting</strong>: The Defaults tab adds an ???Enable asset cache busting??? switch (also auto-enabled for <code>dev.*</code> and <code>wptest.*</code> hosts) to force fresh JS/CSS while testing.</li>
 </ul>
 
-<p>Full changelog lives in the repository’s <code>CHANGELOG.md</code>.</p>
+<p>Full changelog lives in the repository???s <code>CHANGELOG.md</code>.</p>
 
 <hr />
 
