@@ -49,7 +49,7 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
 ```
 
 - Place the shortcode in a classic editor, Gutenberg shortcode block, or template.
-- The SVG renders with default height (600px), zoom controls, pan/scroll behaviour, keyboard shortcuts, and responsive layout.
+- The SVG renders with default height (600px), zoom controls, pan/scroll behaviour, keyboard shortcuts, and responsive layout. Zoom buttons now gray out at the minimum/maximum zoom to make the limits obvious to visitors.
 
 ---
 
@@ -146,6 +146,7 @@ Example:
 - **Load / Refresh Preview**: Injects the SVG using the current field values.
 - **Use Current View for Initial State**: Captures the visible zoom level and center point from the preview and writes them back into the form (ideal for fine-tuning coordinates visually).
 - **Copy Center**: When `show_coords` is enabled, the button copies coordinates to the clipboard.
+- Zoom controls in the preview (and front end) now snap to their minimum/maximum, disable the corresponding buttons, and keep your pointer-focused zoom locked to the selected point—what you see in the preview is exactly what site visitors experience.
 
 ### Preset Shortcodes
 

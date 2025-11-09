@@ -1,3 +1,33 @@
+### 1.0.7
+
+2025-11-09 10:22
+
+#### NEW
+
+- Document shortcode aliases for button colors
+- Provide example shortcode using button_bg/button_fg aliases
+- Pan:drag and zoom:scroll behaviors
+- Pan/zoom behavior shortcode options and gesture captions
+- Update plugin readme highlights and upgrade notice for animated zoom release
+
+#### IMPROVED
+
+- Note preset color pickers for fill/border/foreground
+- Add styling guidance for CSS custom properties
+- Lock zoom to coordinates to prevent drift
+- Smooth transition for zoom and pan
+- Cache-busting toggle and smooth zoom behaviour in project docs
+- Add new options to localizations
+- Disable zoom in/out buttons when at min/max zoom
+- Push center coordinates to live preview so center button works immediately after saving zoom/position coordinates
+- Admin auto-centers newly selected SVGs for easier tweaking
+- Zoom controls snap to min/max and clearly show disabled states
+
+#### FIXED
+
+- Captured center values now match the Center View preview
+- Preset pan mode overrides persist when switching between scroll and drag
+
 ### 1.1.0
 
 2025-11-09 14:10

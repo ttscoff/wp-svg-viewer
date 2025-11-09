@@ -65,15 +65,17 @@ All bundled icon markup runs through `wp_kses` to keep the controls safe. Upload
 == Changelog ==
 
 = 1.1.0 =
-* Add shortcode/preset pan and zoom modes with automatic gesture captions.
-* Animate zoom transitions while keeping the pointer focus locked in place.
-* Make drag panning 1:1 and pause wheel-driven panning conflicts.
+* Add shortcode/preset pan and zoom modes with automatic gesture captions for visitors.
+* Animate zoom transitions while keeping the pointer focus locked under the cursor.
 * Add an “Enable asset cache busting for debugging” toggle (auto-enabled on `dev.*`/`wptest.*` hosts).
+* Make drag panning 1:1 with the pointer and ignore stray wheel input during drags.
+* Prevent unintended panning while zooming so the focus point stays anchored.
 
 = 1.0.7 =
-* Improve preset styling controls and document CSS custom properties for button colors.
-* Add shortcode aliases for `button_bg` and `button_fg`, mapping them to the modern color system.
-* Polish admin Help copy and preset workflow guidance.
+* Document shortcode aliases for button colors and include full examples in the help docs.
+* Explain new pan/zoom behaviour options (drag vs scroll, gesture captions) across the docs and translations.
+* Lock zoom to coordinates, smooth transitions, and disable zoom buttons when limits are reached.
+* Auto-center new SVG selections, keep captured center values in sync with the preview, and refresh localization strings with the latest options.
 
 = 1.0.6 =
 * Ensure generated CSS busts cache correctly when plugin versions change.
