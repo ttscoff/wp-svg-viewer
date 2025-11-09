@@ -9,6 +9,10 @@
   border-radius: 4px;
   overflow: hidden;
   background-color: #fff;
+  --svg-viewer-button-fill: #0073aa;
+  --svg-viewer-button-hover: #005a87;
+  --svg-viewer-button-border: #0073aa;
+  --svg-viewer-button-text: #fff;
 }
 
 .svg-viewer-main {
@@ -116,14 +120,15 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background-color: #0073aa;
-  color: #fff;
-  border: none;
+  background-color: var(--svg-viewer-button-fill, #0073aa);
+  color: var(--svg-viewer-button-text, #fff);
+  border: 1px solid var(--svg-viewer-button-border, #0073aa);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    transform 0.1s ease;
   white-space: nowrap;
 }
 
@@ -144,7 +149,10 @@
 }
 
 .svg-viewer-btn:hover {
-  background-color: #005a87;
+  background-color: var(
+    --svg-viewer-button-hover,
+    var(--svg-viewer-button-fill, #0073aa)
+  );
 }
 
 .svg-viewer-btn:active {

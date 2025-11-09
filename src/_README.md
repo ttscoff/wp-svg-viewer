@@ -1,5 +1,5 @@
-
-# WP SVG Viewer
+<!--README-->
+<!--GITHUB--># WP SVG Viewer
 
 Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tools. Recent releases add a visual preset editor, icon-based controls, deeper shortcode options, and configurable button colors.
 
@@ -29,7 +29,7 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
 - [License \& Credits](#license--credits)
 
 ---
-
+<!--END GITHUB-->
 ## Installation
 
 1. **Unzip the plugin archive**
@@ -38,7 +38,7 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
 2. **Upload the plugin**
    - Copy the entire `wp-svg-viewer` folder into your WordPress installation at `/wp-content/plugins/`.
 3. **Activate**
-   - In the WordPress admin, navigate to **Plugins** and click **Activate** on ???SVG Viewer???.
+   - In the WordPress admin, navigate to **Plugins** and click **Activate** on “SVG Viewer”.
 
 ---
 
@@ -55,25 +55,25 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
 
 ## Shortcode Reference
 
-| Attribute               | Type                          | Default | Description                                                                                  |
-| ----------------------- | ----------------------------- | ------- | -------------------------------------------------------------------------------------------- |
-| `src`                   | string (required)             | ???       | SVG URL. Supports absolute URLs, `/absolute/path.svg`, or relative to the uploads directory. |
-| `height`                | string                        | `600px` | CSS height of the viewer. Accepts px, vh, %, etc.                                            |
-| `class`                 | string                        | ???       | Additional class appended to the wrapper.                                                    |
-| `zoom`                  | number                        | `100`   | Initial zoom percentage.                                                                     |
-| `min_zoom`              | number                        | `25`    | Minimum zoom percentage allowed.                                                             |
-| `max_zoom`              | number                        | `800`   | Maximum zoom percentage allowed.                                                             |
-| `zoom_step`             | number                        | `10`    | Increment used by buttons/keyboard shortcuts.                                                |
-| `center_x` / `center_y` | number                        | ???       | Manual center point in SVG units. Defaults to viewBox center.                                |
-| `show_coords`           | boolean                       | `false` | Appends ???Copy Center??? button for debugging coordinate values.                                |
-| `controls_position`     | `top`/`bottom`/`left`/`right` | `top`   | Placement of the entire control group.                                                       |
-| `controls_buttons`      | string                        | `both`  | Comma-delimited mode/align/button list. See table below.                                     |
-| `title`                 | string                        | ???       | Optional heading above the viewer. HTML allowed.                                             |
-| `caption`               | string                        | ???       | Optional caption below the viewer. HTML allowed.                                             |
-| `button_fill` / `button_background` / `button_bg` | color string | theme default (`#0073aa`) | Button background color. Aliases exist for backwards compatibility (all map to `button_fill`). |
-| `button_border`         | color string                  | matches fill | Outline color for buttons. Blank inherits the fill color.                                    |
-| `button_foreground` / `button_fg` | color string        | `#ffffff` | Text and icon color for buttons. Blank uses the default.                                     |
-| `id`                    | number                        | ???       | Reference a saved preset (admin). Inline attributes override preset values.                  |
+| Attribute                                         | Type                          | Default                   | Description                                                                                    |
+| ------------------------------------------------- | ----------------------------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `src`                                             | string (required)             | –                         | SVG URL. Supports absolute URLs, `/absolute/path.svg`, or relative to the uploads directory.   |
+| `height`                                          | string                        | `600px`                   | CSS height of the viewer. Accepts px, vh, %, etc.                                              |
+| `class`                                           | string                        | –                         | Additional class appended to the wrapper.                                                      |
+| `zoom`                                            | number                        | `100`                     | Initial zoom percentage.                                                                       |
+| `min_zoom`                                        | number                        | `25`                      | Minimum zoom percentage allowed.                                                               |
+| `max_zoom`                                        | number                        | `800`                     | Maximum zoom percentage allowed.                                                               |
+| `zoom_step`                                       | number                        | `10`                      | Increment used by buttons/keyboard shortcuts.                                                  |
+| `center_x` / `center_y`                           | number                        | –                         | Manual center point in SVG units. Defaults to viewBox center.                                  |
+| `show_coords`                                     | boolean                       | `false`                   | Appends “Copy Center” button for debugging coordinate values.                                  |
+| `controls_position`                               | `top`/`bottom`/`left`/`right` | `top`                     | Placement of the entire control group.                                                         |
+| `controls_buttons`                                | string                        | `both`                    | Comma-delimited mode/align/button list. See table below.                                       |
+| `title`                                           | string                        | –                         | Optional heading above the viewer. HTML allowed.                                               |
+| `caption`                                         | string                        | –                         | Optional caption below the viewer. HTML allowed.                                               |
+| `button_fill` / `button_background` / `button_bg` | color string                  | theme default (`#0073aa`) | Button background color. Aliases exist for backwards compatibility (all map to `button_fill`). |
+| `button_border`                                   | color string                  | matches fill              | Outline color for buttons. Blank inherits the fill color.                                      |
+| `button_foreground` / `button_fg`                 | color string                  | `#ffffff`                 | Text and icon color for buttons. Blank uses the default.                                       |
+| `id`                                              | number                        | –                         | Reference a saved preset (admin). Inline attributes override preset values.                    |
 
 ### `controls_buttons` Cheat Sheet
 
@@ -117,7 +117,7 @@ Example:
 
 ### Location
 
-`WordPress Dashboard ??? SVG Viewer ??? Presets`
+`WordPress Dashboard → SVG Viewer → Presets`
 
 ### Fields
 
@@ -128,7 +128,7 @@ Example:
 | **Zoom Settings**           | Minimum, maximum, step, and initial zoom percentages.                          |
 | **Center Coordinates**      | Override auto centering with explicit `center_x`/`center_y`.                   |
 | **Controls Position**       | Dropdown for `top`, `bottom`, `left`, `right`.                                 |
-| **Controls Buttons/Layout** | Text field following the `MODE,ALIGN,buttons???` pattern described above.        |
+| **Controls Buttons/Layout** | Text field following the `MODE,ALIGN,buttons…` pattern described above.        |
 | **Button Colors**           | Three color pickers for fill, border, and foreground (text/icon) colors.       |
 | **Title & Caption**         | Optional, displayed above/below the viewer wrapper.                            |
 
@@ -140,7 +140,7 @@ Example:
 
 ### Preset Shortcodes
 
-- At the top of the preset editor and in the presets list table you???ll find a copy-ready snippet in the form of `[svg_viewer id="123"]`.
+- At the top of the preset editor and in the presets list table you’ll find a copy-ready snippet in the form of `[svg_viewer id="123"]`.
 - Click **Copy** to put the shortcode on the clipboard without selecting manually.
 
 ---
@@ -220,9 +220,9 @@ Example:
 
 Wrapper classes added by the plugin:
 
-- `.svg-viewer-wrapper` ??? outer container
-- `.svg-viewer-main` ??? wraps controls and SVG container
-- `.svg-controls` ??? control bar
+- `.svg-viewer-wrapper` – outer container
+- `.svg-viewer-main` – wraps controls and SVG container
+- `.svg-controls` – control bar
 - `.controls-position-{top|bottom|left|right}`
 - `.controls-mode-{icon|text|both|compact|labels-on-hover|minimal}`
 - `.controls-align-{alignleft|aligncenter|alignright}`
@@ -296,7 +296,7 @@ Toggle `show_coords="true"` or inspect `window.svgViewerInstances['viewer-id']` 
 - **Sanitized Inline SVG**: All icons pass through `wp_kses` to keep output safe.
 - **Configurable Button Colors**: Pick fill, border, and foreground colors in presets or via shortcode aliases (`button_bg`, `button_fg`).
 
-Full changelog lives in the repository???s `CHANGELOG.md`.
+Full changelog lives in the repository’s `CHANGELOG.md`.
 
 ---
 
@@ -304,3 +304,4 @@ Full changelog lives in the repository???s `CHANGELOG.md`.
 
 - License: GPL-2.0 (same as WordPress).
 - Built to make large interactive diagrams pleasant to navigate inside WordPress.
+<!--END README-->

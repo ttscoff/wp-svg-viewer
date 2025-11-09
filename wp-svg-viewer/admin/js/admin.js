@@ -190,6 +190,120 @@
     return isFinite(num) ? num : null;
   }
 
+  function expandShorthandHex(hex) {
+    if (!hex || hex.length !== 4) {
+      return hex;
+    }
+    return (
+      "#" +
+      hex[1] +
+      hex[1] +
+      hex[2] +
+      hex[2] +
+      hex[3] +
+      hex[3]
+    ).toLowerCase();
+  }
+
+  function sanitizeHexColor(value) {
+    if (typeof value !== "string") {
+      return "";
+    }
+    let color = value.trim();
+    if (!color) {
+      return "";
+    }
+    if (color[0] !== "#") {
+      color = "#" + color;
+    }
+    if (/^#[0-9a-fA-F]{3}$/.test(color)) {
+      return expandShorthandHex(color);
+    }
+    if (/^#[0-9a-fA-F]{6}$/.test(color)) {
+      return color.toLowerCase();
+    }
+    return "";
+  }
+
+  function adjustHexBrightness(hex, percentage) {
+    const sanitized = sanitizeHexColor(hex);
+    if (!sanitized) {
+      return "";
+    }
+    const clamped = Math.max(-100, Math.min(100, percentage));
+    const r = parseInt(sanitized.slice(1, 3), 16);
+    const g = parseInt(sanitized.slice(3, 5), 16);
+    const b = parseInt(sanitized.slice(5, 7), 16);
+
+    function adjust(component) {
+      let value = component;
+      if (clamped >= 0) {
+        value += (255 - component) * (clamped / 100);
+      } else {
+        value += component * (clamped / 100);
+      }
+      return Math.max(0, Math.min(255, Math.round(value)));
+    }
+
+    const result =
+      "#" +
+      adjust(r).toString(16).padStart(2, "0") +
+      adjust(g).toString(16).padStart(2, "0") +
+      adjust(b).toString(16).padStart(2, "0");
+
+    return result.toLowerCase();
+  }
+
+  function applyButtonColors($wrapper, fill, border, foreground) {
+    if (!$wrapper || !$wrapper.length) {
+      return;
+    }
+    const props = [
+      "--svg-viewer-button-fill",
+      "--svg-viewer-button-hover",
+      "--svg-viewer-button-border",
+      "--svg-viewer-button-text",
+    ];
+    const sanitizedFill = sanitizeHexColor(fill);
+    const sanitizedBorder = sanitizeHexColor(border);
+    const sanitizedForeground = sanitizeHexColor(foreground);
+
+    $wrapper.each(function () {
+      const element = this;
+      if (!element || !element.style) {
+        return;
+      }
+
+      props.forEach((prop) => {
+        element.style.removeProperty(prop);
+      });
+
+      if (sanitizedFill) {
+        element.style.setProperty("--svg-viewer-button-fill", sanitizedFill);
+        const hover = adjustHexBrightness(sanitizedFill, -12);
+        if (hover) {
+          element.style.setProperty("--svg-viewer-button-hover", hover);
+        }
+      }
+
+      let effectiveBorder = sanitizedBorder;
+      if (!effectiveBorder && sanitizedFill) {
+        effectiveBorder = sanitizedFill;
+      }
+
+      if (effectiveBorder) {
+        element.style.setProperty("--svg-viewer-button-border", effectiveBorder);
+      }
+
+      if (sanitizedForeground) {
+        element.style.setProperty(
+          "--svg-viewer-button-text",
+          sanitizedForeground
+        );
+      }
+    });
+  }
+
   function setViewerText($element, value) {
     if (!value) {
       $element.attr("hidden", true).empty();
@@ -524,6 +638,23 @@
       return;
     }
 
+    const buttonFill = getFieldValue(
+      $metaBox,
+      'input[name="svg_viewer_button_fill"]',
+      ""
+    );
+    const buttonBorder = getFieldValue(
+      $metaBox,
+      'input[name="svg_viewer_button_border"]',
+      ""
+    );
+    const buttonForeground = getFieldValue(
+      $metaBox,
+      'input[name="svg_viewer_button_foreground"]',
+      ""
+    );
+    applyButtonColors($wrapper, buttonFill, buttonBorder, buttonForeground);
+
     const src = getFieldValue(
       $metaBox,
       'input[name="svg_viewer_src"]',
@@ -730,6 +861,53 @@
     });
   }
 
+  function initColorPickers($metaBox, viewerId) {
+    const $fields = $metaBox.find(".svg-viewer-color-field");
+
+    const refreshColors = function () {
+      const fill = getFieldValue(
+        $metaBox,
+        'input[name="svg_viewer_button_fill"]',
+        ""
+      );
+      const border = getFieldValue(
+        $metaBox,
+        'input[name="svg_viewer_button_border"]',
+        ""
+      );
+      const foreground = getFieldValue(
+        $metaBox,
+        'input[name="svg_viewer_button_foreground"]',
+        ""
+      );
+      applyButtonColors($("#" + viewerId), fill, border, foreground);
+    };
+
+    if (typeof $.fn.wpColorPicker === "function" && $fields.length) {
+      $fields.each(function () {
+        const $field = $(this);
+        $field.wpColorPicker({
+          change: function () {
+            refreshColors();
+          },
+          clear: function () {
+            refreshColors();
+          },
+        });
+      });
+    }
+
+    $metaBox.on(
+      "input",
+      'input[name="svg_viewer_button_fill"], input[name="svg_viewer_button_border"], input[name="svg_viewer_button_foreground"]',
+      function () {
+        refreshColors();
+      }
+    );
+
+    refreshColors();
+  }
+
   $(document).ready(function () {
     initTabs($(document));
 
@@ -748,6 +926,7 @@
       const $status = $metaBox.find(".svg-admin-status");
 
       bindMediaSelector($metaBox);
+      initColorPickers($metaBox, viewerId);
 
       $metaBox.on("click", ".svg-admin-refresh-preview", function () {
         $status.text("").removeClass("error");

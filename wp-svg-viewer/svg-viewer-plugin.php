@@ -3,7 +3,7 @@
  * Plugin Name: WP SVG Viewer
  * Plugin URI: https://github.com/ttscoff/wp-svg-viewer/
  * Description: Embed interactive SVG files with zoom and pan controls
- * Version: 1.0.6
+ * Version: 1.0.7
  * Author: Brett Terpstra
  * Author URI: https://brettterpstra.com
  * License: GPL2
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 class SVG_Viewer
 {
     private static $instance = null;
-    private $plugin_version = '1.0.6';
+    private $plugin_version = '1.0.7';
     private $preset_meta_fields = array(
         'svg_viewer_src' => '_svg_src',
         'svg_viewer_height' => '_svg_height',
@@ -34,6 +34,11 @@ class SVG_Viewer
         'svg_viewer_attachment_id' => '_svg_attachment_id',
         'svg_viewer_controls_position' => '_svg_controls_position',
         'svg_viewer_controls_buttons' => '_svg_controls_buttons',
+        'svg_viewer_button_fill' => '_svg_button_fill',
+        'svg_viewer_button_border' => '_svg_button_border',
+        'svg_viewer_button_foreground' => '_svg_button_foreground',
+        'svg_viewer_button_fill' => '_svg_button_fill',
+        'svg_viewer_button_border' => '_svg_button_border',
     );
     private $current_presets_admin_tab = null;
 
@@ -299,7 +304,42 @@ class SVG_Viewer
             'id' => '',
             'controls_position' => 'top',
             'controls_buttons' => 'both',
+            'button_fill' => '',
+            'button_border' => '',
+            'button_background' => '',
+            'button_bg' => '',
+            'button_foreground' => '',
+            'button_fg' => '',
         ), $atts, 'svg_viewer');
+
+        if (!array_key_exists('button_fill', $raw_atts)) {
+            if (array_key_exists('button_background', $raw_atts)) {
+                $raw_atts['button_fill'] = $raw_atts['button_background'];
+            } elseif (array_key_exists('button_bg', $raw_atts)) {
+                $raw_atts['button_fill'] = $raw_atts['button_bg'];
+            }
+        }
+
+        if (!array_key_exists('button_foreground', $raw_atts)) {
+            if (array_key_exists('button_fg', $raw_atts)) {
+                $raw_atts['button_foreground'] = $raw_atts['button_fg'];
+            }
+        }
+
+        $button_background = $atts['button_background'];
+        if ($button_background === '') {
+            $button_background = $atts['button_bg'];
+        }
+        if ($button_background === '') {
+            $button_background = $atts['button_fill'];
+        }
+        $atts['button_fill'] = $button_background;
+
+        $button_foreground = $atts['button_foreground'];
+        if ($button_foreground === '') {
+            $button_foreground = $atts['button_fg'];
+        }
+        $atts['button_foreground'] = $button_foreground;
 
         if (!empty($atts['id'])) {
             $preset_id = absint($atts['id']);
@@ -392,6 +432,13 @@ class SVG_Viewer
         $initial_zoom_percent = (int) round($initial_zoom * 100);
         $controls_markup = $this->render_controls_markup($viewer_id, $controls_config, $initial_zoom_percent);
 
+        $button_style_declarations = $this->get_button_color_style_declarations(
+            $atts['button_fill'],
+            $atts['button_border'],
+            $atts['button_foreground']
+        );
+        $wrapper_style_attribute_value = $this->build_style_attribute($button_style_declarations);
+
         $wrapper_classes = array('svg-viewer-wrapper');
         if (!empty($custom_class)) {
             $wrapper_classes[] = $custom_class;
@@ -405,6 +452,10 @@ class SVG_Viewer
         if ($controls_config['mode'] === 'hidden') {
             $wrapper_classes[] = 'controls-hidden';
         }
+
+        $atts['button_fill'] = $this->sanitize_color_value($atts['button_fill']);
+        $atts['button_border'] = $this->sanitize_color_value($atts['button_border']);
+        $atts['button_foreground'] = $this->sanitize_color_value($atts['button_foreground']);
 
         $main_classes = array(
             'svg-viewer-main',
@@ -421,7 +472,11 @@ class SVG_Viewer
 
         ob_start();
         ?>
-        <div class="<?php echo esc_attr($wrapper_class_attribute); ?>" id="<?php echo esc_attr($viewer_id); ?>">
+        <div class="<?php echo esc_attr($wrapper_class_attribute); ?>" id="<?php echo esc_attr($viewer_id); ?>" <?php
+              if ($wrapper_style_attribute_value !== '') {
+                  echo ' style="' . esc_attr($wrapper_style_attribute_value) . '"';
+              }
+              ?>>
             <?php if (!empty($title)): ?>
                 <div class="svg-viewer-title"><?php echo wp_kses_post($title); ?></div>
             <?php endif; ?>
@@ -542,6 +597,8 @@ class SVG_Viewer
         }
 
         wp_enqueue_media();
+        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_script('wp-color-picker');
 
         wp_enqueue_style(
             'svg-viewer-style',
@@ -572,7 +629,7 @@ class SVG_Viewer
         wp_enqueue_script(
             'svg-viewer-admin',
             plugins_url('admin/js/admin.js', __FILE__),
-            array('jquery', 'svg-viewer-script'),
+            array('jquery', 'svg-viewer-script', 'wp-color-picker'),
             $this->plugin_version,
             true
         );
@@ -629,6 +686,9 @@ class SVG_Viewer
             'attachment_id' => '',
             'controls_position' => 'top',
             'controls_buttons' => 'both',
+            'button_fill' => '',
+            'button_border' => '',
+            'button_foreground' => '',
         );
 
         $values = array(
@@ -645,6 +705,9 @@ class SVG_Viewer
             'attachment_id' => get_post_meta($post->ID, '_svg_attachment_id', true),
             'controls_position' => get_post_meta($post->ID, '_svg_controls_position', true),
             'controls_buttons' => get_post_meta($post->ID, '_svg_controls_buttons', true),
+            'button_fill' => get_post_meta($post->ID, '_svg_button_fill', true),
+            'button_border' => get_post_meta($post->ID, '_svg_button_border', true),
+            'button_foreground' => get_post_meta($post->ID, '_svg_button_foreground', true),
         );
 
         $values = wp_parse_args($values, $defaults);
@@ -683,6 +746,13 @@ class SVG_Viewer
 
         $wrapper_class_attribute = $this->build_class_attribute($wrapper_classes);
         $main_class_attribute = $this->build_class_attribute($main_classes);
+        $wrapper_style_attribute_value = $this->build_style_attribute(
+            $this->get_button_color_style_declarations(
+                $values['button_fill'],
+                $values['button_border'],
+                $values['button_foreground']
+            )
+        );
         $settings_panel_id = $viewer_id . '-tab-settings';
         $help_panel_id = $viewer_id . '-tab-help';
         $changes_panel_id = $viewer_id . '-tab-changes';
@@ -811,6 +881,39 @@ class SVG_Viewer
                             </div>
                         </div>
 
+                        <div class="svg-viewer-field-group">
+                            <div class="svg-viewer-field">
+                                <label
+                                    for="svg-viewer-button-fill"><?php esc_html_e('Button Fill Color', 'svg-viewer'); ?></label>
+                                <input type="text" id="svg-viewer-button-fill" name="svg_viewer_button_fill"
+                                    class="svg-viewer-color-field" value="<?php echo esc_attr($values['button_fill']); ?>"
+                                    data-default-color="#0073aa" />
+                                <p class="description">
+                                    <?php esc_html_e('Choose the primary color for the control buttons. Leave blank to use the default.', 'svg-viewer'); ?>
+                                </p>
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label
+                                    for="svg-viewer-button-border"><?php esc_html_e('Button Border Color', 'svg-viewer'); ?></label>
+                                <input type="text" id="svg-viewer-button-border" name="svg_viewer_button_border"
+                                    class="svg-viewer-color-field" value="<?php echo esc_attr($values['button_border']); ?>"
+                                    data-default-color="#0073aa" />
+                                <p class="description">
+                                    <?php esc_html_e('Set the border color for the control buttons. Leave blank to match the fill color.', 'svg-viewer'); ?>
+                                </p>
+                            </div>
+                            <div class="svg-viewer-field">
+                                <label
+                                    for="svg-viewer-button-foreground"><?php esc_html_e('Button Foreground Color', 'svg-viewer'); ?></label>
+                                <input type="text" id="svg-viewer-button-foreground" name="svg_viewer_button_foreground"
+                                    class="svg-viewer-color-field" value="<?php echo esc_attr($values['button_foreground']); ?>"
+                                    data-default-color="#ffffff" />
+                                <p class="description">
+                                    <?php esc_html_e('Set the icon and text color for the control buttons. Leave blank to use the default.', 'svg-viewer'); ?>
+                                </p>
+                            </div>
+                        </div>
+
                         <div class="svg-viewer-field">
                             <label for="svg-viewer-title"><?php esc_html_e('Title (optional)', 'svg-viewer'); ?></label>
                             <input type="text" id="svg-viewer-title" name="svg_viewer_title"
@@ -833,7 +936,11 @@ class SVG_Viewer
                                 <span class="svg-admin-status" aria-live="polite"></span>
                             </div>
                             <div class="<?php echo esc_attr($wrapper_class_attribute); ?>"
-                                id="<?php echo esc_attr($viewer_id); ?>">
+                                id="<?php echo esc_attr($viewer_id); ?>" <?php
+                                   if ($wrapper_style_attribute_value !== '') {
+                                       echo ' style="' . esc_attr($wrapper_style_attribute_value) . '"';
+                                   }
+                                   ?>>
                                 <div class="svg-viewer-title js-admin-title" hidden></div>
                                 <div class="<?php echo esc_attr($main_class_attribute); ?>"
                                     data-viewer="<?php echo esc_attr($viewer_id); ?>">
@@ -1256,6 +1363,135 @@ class SVG_Viewer
     }
 
     /**
+     * Build an inline style attribute string from declarations.
+     *
+     * @param array $declarations
+     * @return string
+     */
+    private function build_style_attribute(array $declarations)
+    {
+        $sanitized = array();
+
+        foreach ($declarations as $declaration) {
+            $declaration = trim((string) $declaration);
+            if ($declaration === '') {
+                continue;
+            }
+            // Remove trailing semicolons to avoid duplication.
+            $sanitized[] = rtrim($declaration, ';');
+        }
+
+        if (empty($sanitized)) {
+            return '';
+        }
+
+        return implode('; ', array_unique($sanitized));
+    }
+
+    /**
+     * Sanitize a color value to a valid hex string.
+     *
+     * @param string $color
+     * @return string
+     */
+    private function sanitize_color_value($color)
+    {
+        if (!function_exists('sanitize_hex_color')) {
+            return '';
+        }
+
+        $color = is_string($color) ? trim($color) : '';
+
+        if ($color === '') {
+            return '';
+        }
+
+        $sanitized = sanitize_hex_color($color);
+
+        return $sanitized ? $sanitized : '';
+    }
+
+    /**
+     * Adjust the brightness of a hex color by a percentage.
+     *
+     * @param string $hex_color
+     * @param float  $percentage Positive to lighten, negative to darken.
+     * @return string
+     */
+    private function adjust_color_brightness($hex_color, $percentage)
+    {
+        $hex = ltrim($hex_color, '#');
+
+        if ($hex === '') {
+            return '';
+        }
+
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        } elseif (strlen($hex) !== 6) {
+            return '';
+        }
+
+        $percentage = max(-100, min(100, (float) $percentage));
+
+        $components = array(
+            hexdec(substr($hex, 0, 2)),
+            hexdec(substr($hex, 2, 2)),
+            hexdec(substr($hex, 4, 2)),
+        );
+
+        foreach ($components as $index => $component) {
+            if ($percentage >= 0) {
+                $component += (255 - $component) * ($percentage / 100);
+            } else {
+                $component += $component * ($percentage / 100);
+            }
+            $components[$index] = max(0, min(255, (int) round($component)));
+        }
+
+        return sprintf('#%02x%02x%02x', $components[0], $components[1], $components[2]);
+    }
+
+    /**
+     * Generate CSS custom property declarations for button colors.
+     *
+     * @param string $fill
+     * @param string $border
+     * @param string $foreground
+     * @return array
+     */
+    private function get_button_color_style_declarations($fill, $border, $foreground = '')
+    {
+        $declarations = array();
+
+        $fill_color = $this->sanitize_color_value($fill);
+        $border_color = $this->sanitize_color_value($border);
+        $foreground_color = $this->sanitize_color_value($foreground);
+
+        if ($fill_color !== '') {
+            $declarations[] = '--svg-viewer-button-fill: ' . $fill_color;
+            $hover_color = $this->adjust_color_brightness($fill_color, -12);
+            if ($hover_color !== '') {
+                $declarations[] = '--svg-viewer-button-hover: ' . $hover_color;
+            }
+        }
+
+        if ($border_color === '' && $fill_color !== '') {
+            $border_color = $fill_color;
+        }
+
+        if ($border_color !== '') {
+            $declarations[] = '--svg-viewer-button-border: ' . $border_color;
+        }
+
+        if ($foreground_color !== '') {
+            $declarations[] = '--svg-viewer-button-text: ' . $foreground_color;
+        }
+
+        return $declarations;
+    }
+
+    /**
      * Render the controls markup based on configuration.
      *
      * @param string $viewer_id
@@ -1412,6 +1648,27 @@ class SVG_Viewer
                 delete_post_meta($post_id, $meta_key);
             }
         }
+
+        $color_fields = array(
+            '_svg_button_fill' => 'svg_viewer_button_fill',
+            '_svg_button_border' => 'svg_viewer_button_border',
+            '_svg_button_foreground' => 'svg_viewer_button_foreground',
+        );
+
+        foreach ($color_fields as $meta_key => $post_key) {
+            if (isset($_POST[$post_key]) && $_POST[$post_key] !== '') {
+                $raw_color = wp_unslash($_POST[$post_key]);
+                $sanitized_color = $this->sanitize_color_value($raw_color);
+
+                if ($sanitized_color !== '') {
+                    update_post_meta($post_id, $meta_key, $sanitized_color);
+                } else {
+                    delete_post_meta($post_id, $meta_key);
+                }
+            } else {
+                delete_post_meta($post_id, $meta_key);
+            }
+        }
     }
 
     /**
@@ -1437,6 +1694,9 @@ class SVG_Viewer
             'caption' => get_post_meta($preset_id, '_svg_caption', true),
             'controls_position' => get_post_meta($preset_id, '_svg_controls_position', true),
             'controls_buttons' => get_post_meta($preset_id, '_svg_controls_buttons', true),
+            'button_fill' => get_post_meta($preset_id, '_svg_button_fill', true),
+            'button_border' => get_post_meta($preset_id, '_svg_button_border', true),
+            'button_foreground' => get_post_meta($preset_id, '_svg_button_foreground', true),
         );
 
         if (empty($settings['height'])) {
@@ -1450,6 +1710,11 @@ class SVG_Viewer
         if ($settings['controls_buttons'] === '' || $settings['controls_buttons'] === null) {
             $settings['controls_buttons'] = 'both';
         }
+
+        $settings['button_fill'] = $this->sanitize_color_value($settings['button_fill']);
+        $settings['button_border'] = $this->sanitize_color_value($settings['button_border']);
+        $settings['button_foreground'] = $this->sanitize_color_value($settings['button_foreground']);
+
 
         foreach (array('min_zoom', 'max_zoom', 'zoom', 'zoom_step', 'center_x', 'center_y') as $key) {
             if ($settings[$key] !== '' && $settings[$key] !== null) {
