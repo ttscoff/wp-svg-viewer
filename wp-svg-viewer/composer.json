@@ -9,5 +9,10 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "wp-coding-standards/wpcs": "^3.0",
     "php-stubs/wordpress-stubs": "^6.5"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }

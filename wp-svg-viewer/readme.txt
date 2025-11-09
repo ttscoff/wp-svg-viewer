@@ -27,6 +27,12 @@ Use the `[svg_viewer]` shortcode anywhere shortcodes are supported. Pass a direc
 = Preset Workflow =
 Create a preset from **SVG Viewer → Presets** in the admin. Upload an SVG, tune the controls, tweak button colors, then load the preview to dial in the initial zoom and center point. Save the preset and drop the generated `[svg_viewer id="123"]` shortcode wherever you need the viewer. Inline attributes always win over stored preset values, making it easy to reuse a baseline configuration.
 
+== Localization ==
+
+Available translations: German (de_DE), Spanish (es_ES), French (fr_FR), Italian (it_IT).
+
+Translations were initially produced with AI assistance; corrections are welcome via https://github.com/ttscoff/wp-svg-viewer/issues.
+
 == Installation ==
 
 1. Upload the `wp-svg-viewer` folder to the `/wp-content/plugins/` directory, or install the ZIP archive via **Plugins → Add New → Upload Plugin**.

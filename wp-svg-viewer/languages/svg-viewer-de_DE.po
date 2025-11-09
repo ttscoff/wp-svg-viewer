@@ -13,6 +13,44 @@ msgstr ""
 "X-Generator: GPT-5 Codex\n"
 "X-Domain: svg-viewer\n"
 
+#: wp-svg-viewer/admin/js/admin.js:35
+msgid "Full shortcode copied to clipboard."
+msgstr "Vollständiger Shortcode in die Zwischenablage kopiert."
+
+#: wp-svg-viewer/admin/js/admin.js:1297
+msgid "Copy full shortcode"
+msgstr "Vollständigen Shortcode kopieren"
+
+#: wp-svg-viewer/svg-viewer-plugin.php:647
+msgid "Enable asset cache busting for debugging"
+msgstr "Asset-Cache-Busting für Debugging aktivieren"
+
+#: wp-svg-viewer/svg-viewer-plugin.php:651
+msgid ""
+"Adds a unique suffix to script and style versions so browsers always fetch "
+"the latest assets. Useful for local testing; disable for production."
+msgstr ""
+"Fügt Skript- und Stilversionen ein eindeutiges Suffix hinzu, damit Browser "
+"immer die neuesten Assets laden. Nützlich für lokale Tests; für den "
+"Produktionsbetrieb deaktivieren."
+
+#: wp-svg-viewer/js/svg-viewer.js:404
+msgid "Cmd/Ctrl-click to zoom in, Option/Alt-click to zoom out."
+msgstr ""
+"Mit Cmd/Strg-Klick vergrößern, mit Wahltaste/Alt-Klick verkleinern."
+
+#: wp-svg-viewer/js/svg-viewer.js:406
+msgid "Scroll up to zoom in, scroll down to zoom out."
+msgstr "Nach oben scrollen zum Vergrößern, nach unten scrollen zum Verkleinern."
+
+#: wp-svg-viewer/js/svg-viewer.js:409
+msgid "Drag to pan around the image while scrolling zooms."
+msgstr "Ziehen zum Schwenken, während scrollen zoomt."
+
+#: wp-svg-viewer/js/svg-viewer.js:411
+msgid "Drag to pan around the image."
+msgstr "Ziehen zum Schwenken des Bildes."
+
 msgid "Error: SVG preset not found for ID %s."
 msgstr "Fehler: SVG-Voreinstellung wurde für die ID %s nicht gefunden."
 

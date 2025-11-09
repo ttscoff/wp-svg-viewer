@@ -13,6 +13,47 @@ msgstr ""
 "X-Generator: GPT-5 Codex\n"
 "X-Domain: svg-viewer\n"
 
+#: wp-svg-viewer/admin/js/admin.js:35
+msgid "Full shortcode copied to clipboard."
+msgstr "Shortcode complet copié dans le presse-papiers."
+
+#: wp-svg-viewer/admin/js/admin.js:1297
+msgid "Copy full shortcode"
+msgstr "Copier le shortcode complet"
+
+#: wp-svg-viewer/svg-viewer-plugin.php:647
+msgid "Enable asset cache busting for debugging"
+msgstr "Activer le cache-busting des ressources pour le débogage"
+
+#: wp-svg-viewer/svg-viewer-plugin.php:651
+msgid ""
+"Adds a unique suffix to script and style versions so browsers always fetch "
+"the latest assets. Useful for local testing; disable for production."
+msgstr ""
+"Ajoute un suffixe unique aux versions des scripts et styles afin que les "
+"navigateurs récupèrent toujours les dernières ressources. Utile pour les "
+"tests locaux ; à désactiver en production."
+
+#: wp-svg-viewer/js/svg-viewer.js:404
+msgid "Cmd/Ctrl-click to zoom in, Option/Alt-click to zoom out."
+msgstr ""
+"Cliquer avec Cmd/Ctrl pour zoomer, cliquer avec Option/Alt pour dézoomer."
+
+#: wp-svg-viewer/js/svg-viewer.js:406
+msgid "Scroll up to zoom in, scroll down to zoom out."
+msgstr ""
+"Faites défiler vers le haut pour zoomer, vers le bas pour dézoomer."
+
+#: wp-svg-viewer/js/svg-viewer.js:409
+msgid "Drag to pan around the image while scrolling zooms."
+msgstr ""
+"Faites glisser pour vous déplacer dans l’image pendant que le défilement "
+"effectue un zoom."
+
+#: wp-svg-viewer/js/svg-viewer.js:411
+msgid "Drag to pan around the image."
+msgstr "Faites glisser pour vous déplacer dans l’image."
+
 msgid "Error: SVG preset not found for ID %s."
 msgstr "Erreur : préréglage SVG introuvable pour l’ID %s."
 
