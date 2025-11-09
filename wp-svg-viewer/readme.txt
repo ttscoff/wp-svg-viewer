@@ -1,11 +1,13 @@
 === WP SVG Viewer ===
+An accessible shortcode-based SVG viewer with presets, zoom, and pan controls.
+
 Contributors: ttscoff
 Donate link: https://brettterpstra.com/donate/
 Tags: svg, shortcode, maps, zoom, viewer
 Requires at least: 5.8
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.7
+Stable tag: 1.0.9
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 

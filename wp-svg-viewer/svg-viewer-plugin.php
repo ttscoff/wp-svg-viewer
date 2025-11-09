@@ -3,11 +3,11 @@
  * Plugin Name: WP SVG Viewer
  * Plugin URI: https://github.com/ttscoff/wp-svg-viewer/
  * Description: Embed interactive SVG files with zoom and pan controls
- * Version: 1.0.8
+ * Version: 1.0.9
  * Author: Brett Terpstra
  * Author URI: https://brettterpstra.com
  * License: GPL2
- * Text Domain: svg-viewer
+ * Text Domain: wp-svg-viewer
  * Domain Path: /languages
  */
 
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 class SVG_Viewer
 {
     private static $instance = null;
-    private $plugin_version = '1.0.8';
+    private $plugin_version = '1.0.9';
     private $preset_meta_fields = array(
         'svg_viewer_src' => '_svg_src',
         'svg_viewer_height' => '_svg_height',
@@ -57,7 +57,6 @@ class SVG_Viewer
     public function __construct()
     {
         $this->plugin_version = $this->read_plugin_version();
-        add_action('plugins_loaded', array($this, 'load_textdomain'));
         add_shortcode('svg_viewer', array($this, 'render_shortcode'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
         add_filter('upload_mimes', array($this, 'svg_use_mimetypes'));
@@ -340,15 +339,6 @@ class SVG_Viewer
 
         return $sanitized;
     }
-
-    /**
-     * Load plugin textdomain for translations
-     */
-    public function load_textdomain()
-    {
-        load_plugin_textdomain('svg-viewer', false, dirname(plugin_basename(__FILE__)) . '/languages');
-    }
-
     /**
      * Determine whether assets should use a cache-busting version.
      *
@@ -470,10 +460,10 @@ class SVG_Viewer
 
         $base_url = add_query_arg('post_type', 'svg_viewer_preset', admin_url('edit.php'));
         $tabs = array(
-            'presets' => __('Presets', 'svg-viewer'),
-            'defaults' => __('Default Options', 'svg-viewer'),
-            'help' => __('Help', 'svg-viewer'),
-            'changes' => __('Changes', 'svg-viewer'),
+            'presets' => __('Presets', 'wp-svg-viewer'),
+            'defaults' => __('Default Options', 'wp-svg-viewer'),
+            'help' => __('Help', 'wp-svg-viewer'),
+            'changes' => __('Changes', 'wp-svg-viewer'),
         );
 
         echo '<div class="svg-viewer-admin-screen-tabs nav-tab-wrapper">';
@@ -519,7 +509,7 @@ class SVG_Viewer
             if ($help_markup !== '') {
                 echo $help_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             } else {
-                printf('<p>%s</p>', esc_html__('Help content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'svg-viewer'));
+                printf('<p>%s</p>', esc_html__('Help content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'wp-svg-viewer'));
             }
         } elseif ($this->current_presets_admin_tab === 'defaults') {
             $this->render_presets_default_options_panel();
@@ -528,7 +518,7 @@ class SVG_Viewer
             if ($changelog_markup !== '') {
                 echo $changelog_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             } else {
-                printf('<p>%s</p>', esc_html__('Changes content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'svg-viewer'));
+                printf('<p>%s</p>', esc_html__('Changes content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'wp-svg-viewer'));
             }
         }
 
@@ -543,7 +533,7 @@ class SVG_Viewer
     private function render_presets_default_options_panel()
     {
         if (!current_user_can('manage_options')) {
-            printf('<p>%s</p>', esc_html__('You do not have permission to modify the default options.', 'svg-viewer'));
+            printf('<p>%s</p>', esc_html__('You do not have permission to modify the default options.', 'wp-svg-viewer'));
             return;
         }
 
@@ -551,16 +541,16 @@ class SVG_Viewer
         $status = isset($_GET['svg_defaults_status']) ? sanitize_key(wp_unslash($_GET['svg_defaults_status'])) : '';
 
         if ($status === 'updated') {
-            echo '<div class="notice notice-success"><p>' . esc_html__('Default options updated.', 'svg-viewer') . '</p></div>';
+            echo '<div class="notice notice-success"><p>' . esc_html__('Default options updated.', 'wp-svg-viewer') . '</p></div>';
         } elseif ($status === 'error') {
-            echo '<div class="notice notice-error"><p>' . esc_html__('Unable to update the default options. Please try again.', 'svg-viewer') . '</p></div>';
+            echo '<div class="notice notice-error"><p>' . esc_html__('Unable to update the default options. Please try again.', 'wp-svg-viewer') . '</p></div>';
         }
 
         $form_action = admin_url('admin-post.php');
         ?>
-        <p><?php esc_html_e('Adjust the defaults that populate new SVG Viewer presets. Existing presets are not affected.', 'svg-viewer'); ?>
+        <p><?php esc_html_e('Adjust the defaults that populate new SVG Viewer presets. Existing presets are not affected.', 'wp-svg-viewer'); ?>
         </p>
-        <p><?php esc_html_e('Center X and Center Y automatically default to the middle of the SVG and are not configurable here. Set preset-specific SVG sources while editing each preset.', 'svg-viewer'); ?>
+        <p><?php esc_html_e('Center X and Center Y automatically default to the middle of the SVG and are not configurable here. Set preset-specific SVG sources while editing each preset.', 'wp-svg-viewer'); ?>
         </p>
         <form method="post" action="<?php echo esc_url($form_action); ?>" class="svg-viewer-defaults-form">
             <?php wp_nonce_field('svg_viewer_save_defaults', 'svg_viewer_defaults_nonce'); ?>
@@ -568,29 +558,29 @@ class SVG_Viewer
             <div class="svg-viewer-defaults-meta">
                 <div class="svg-viewer-field-group">
                     <div class="svg-viewer-field">
-                        <label for="svg-viewer-default-height"><?php esc_html_e('Viewer Height', 'svg-viewer'); ?></label>
+                        <label for="svg-viewer-default-height"><?php esc_html_e('Viewer Height', 'wp-svg-viewer'); ?></label>
                         <input type="text" id="svg-viewer-default-height" name="svg_viewer_height"
                             value="<?php echo esc_attr($defaults['height']); ?>" placeholder="600px" />
                     </div>
                     <div class="svg-viewer-field">
-                        <label for="svg-viewer-default-min-zoom"><?php esc_html_e('Min Zoom (%)', 'svg-viewer'); ?></label>
+                        <label for="svg-viewer-default-min-zoom"><?php esc_html_e('Min Zoom (%)', 'wp-svg-viewer'); ?></label>
                         <input type="number" id="svg-viewer-default-min-zoom" name="svg_viewer_min_zoom"
                             value="<?php echo esc_attr($defaults['min_zoom']); ?>" min="1" step="1" />
                     </div>
                     <div class="svg-viewer-field">
-                        <label for="svg-viewer-default-max-zoom"><?php esc_html_e('Max Zoom (%)', 'svg-viewer'); ?></label>
+                        <label for="svg-viewer-default-max-zoom"><?php esc_html_e('Max Zoom (%)', 'wp-svg-viewer'); ?></label>
                         <input type="number" id="svg-viewer-default-max-zoom" name="svg_viewer_max_zoom"
                             value="<?php echo esc_attr($defaults['max_zoom']); ?>" min="1" step="1" />
                     </div>
                     <div class="svg-viewer-field">
                         <label
-                            for="svg-viewer-default-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'svg-viewer'); ?></label>
+                            for="svg-viewer-default-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'wp-svg-viewer'); ?></label>
                         <input type="number" id="svg-viewer-default-initial-zoom" name="svg_viewer_initial_zoom"
                             value="<?php echo esc_attr($defaults['initial_zoom']); ?>" min="1" step="1" />
                     </div>
                     <div class="svg-viewer-field">
                         <label
-                            for="svg-viewer-default-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'svg-viewer'); ?></label>
+                            for="svg-viewer-default-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'wp-svg-viewer'); ?></label>
                         <input type="number" id="svg-viewer-default-zoom-step" name="svg_viewer_zoom_step"
                             value="<?php echo esc_attr($defaults['zoom_step']); ?>" min="0.1" step="0.1" />
                     </div>
@@ -599,14 +589,14 @@ class SVG_Viewer
                 <div class="svg-viewer-field-group">
                     <div class="svg-viewer-field">
                         <label
-                            for="svg-viewer-default-controls-position"><?php esc_html_e('Controls Position', 'svg-viewer'); ?></label>
+                            for="svg-viewer-default-controls-position"><?php esc_html_e('Controls Position', 'wp-svg-viewer'); ?></label>
                         <select id="svg-viewer-default-controls-position" name="svg_viewer_controls_position">
                             <?php
                             $positions_options = array(
-                                'top' => __('Top', 'svg-viewer'),
-                                'bottom' => __('Bottom', 'svg-viewer'),
-                                'left' => __('Left', 'svg-viewer'),
-                                'right' => __('Right', 'svg-viewer'),
+                                'top' => __('Top', 'wp-svg-viewer'),
+                                'bottom' => __('Bottom', 'wp-svg-viewer'),
+                                'left' => __('Left', 'wp-svg-viewer'),
+                                'right' => __('Right', 'wp-svg-viewer'),
                             );
                             foreach ($positions_options as $pos_value => $label):
                                 ?>
@@ -618,23 +608,24 @@ class SVG_Viewer
                     </div>
                     <div class="svg-viewer-field">
                         <label
-                            for="svg-viewer-default-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'svg-viewer'); ?></label>
+                            for="svg-viewer-default-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'wp-svg-viewer'); ?></label>
                         <input type="text" id="svg-viewer-default-controls-buttons" name="svg_viewer_controls_buttons"
                             value="<?php echo esc_attr($defaults['controls_buttons']); ?>" placeholder="both" />
                         <p class="description">
-                            <?php esc_html_e('Combine multiple options with commas. Examples: both, icon, text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords', 'svg-viewer'); ?>
+                            <?php esc_html_e('Combine multiple options with commas. Examples: both, icon, text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords', 'wp-svg-viewer'); ?>
                         </p>
                     </div>
                 </div>
 
                 <div class="svg-viewer-field-group">
                     <div class="svg-viewer-field">
-                        <label for="svg-viewer-default-pan-mode"><?php esc_html_e('Pan Interaction', 'svg-viewer'); ?></label>
+                        <label
+                            for="svg-viewer-default-pan-mode"><?php esc_html_e('Pan Interaction', 'wp-svg-viewer'); ?></label>
                         <select id="svg-viewer-default-pan-mode" name="svg_viewer_pan_mode">
                             <?php
                             $pan_options = array(
-                                'scroll' => __('Scroll (default)', 'svg-viewer'),
-                                'drag' => __('Drag to pan', 'svg-viewer'),
+                                'scroll' => __('Scroll (default)', 'wp-svg-viewer'),
+                                'drag' => __('Drag to pan', 'wp-svg-viewer'),
                             );
                             foreach ($pan_options as $pan_value => $pan_label):
                                 ?>
@@ -644,17 +635,18 @@ class SVG_Viewer
                             <?php endforeach; ?>
                         </select>
                         <p class="description">
-                            <?php esc_html_e('Choose how visitors move around the SVG. Drag temporarily replaces scroll when required by other settings.', 'svg-viewer'); ?>
+                            <?php esc_html_e('Choose how visitors move around the SVG. Drag temporarily replaces scroll when required by other settings.', 'wp-svg-viewer'); ?>
                         </p>
                     </div>
                     <div class="svg-viewer-field">
-                        <label for="svg-viewer-default-zoom-mode"><?php esc_html_e('Zoom Interaction', 'svg-viewer'); ?></label>
+                        <label
+                            for="svg-viewer-default-zoom-mode"><?php esc_html_e('Zoom Interaction', 'wp-svg-viewer'); ?></label>
                         <select id="svg-viewer-default-zoom-mode" name="svg_viewer_zoom_mode">
                             <?php
                             $zoom_options = array(
-                                'super_scroll' => __('Cmd/Ctrl-scroll (default)', 'svg-viewer'),
-                                'scroll' => __('Scroll wheel (no modifier)', 'svg-viewer'),
-                                'click' => __('Modifier click', 'svg-viewer'),
+                                'super_scroll' => __('Cmd/Ctrl-scroll (default)', 'wp-svg-viewer'),
+                                'scroll' => __('Scroll wheel (no modifier)', 'wp-svg-viewer'),
+                                'click' => __('Modifier click', 'wp-svg-viewer'),
                             );
                             foreach ($zoom_options as $zoom_value => $zoom_label):
                                 ?>
@@ -664,17 +656,17 @@ class SVG_Viewer
                             <?php endforeach; ?>
                         </select>
                         <p class="description">
-                            <?php esc_html_e('Scroll wheel zoom overrides pan-on-scroll. Cmd/Ctrl-click zooms in and Option/Alt-click zooms out when using modifier click.', 'svg-viewer'); ?>
+                            <?php esc_html_e('Scroll wheel zoom overrides pan-on-scroll. Cmd/Ctrl-click zooms in and Option/Alt-click zooms out when using modifier click.', 'wp-svg-viewer'); ?>
                         </p>
                     </div>
                     <div class="svg-viewer-field svg-viewer-field-checkbox">
                         <label for="svg-viewer-debug-cache-bust">
                             <input type="checkbox" id="svg-viewer-debug-cache-bust" name="svg_viewer_debug_cache_bust" value="1"
                                 <?php checked(!empty($defaults['debug_cache_bust'])); ?> />
-                            <?php esc_html_e('Enable asset cache busting for debugging', 'svg-viewer'); ?>
+                            <?php esc_html_e('Enable asset cache busting for debugging', 'wp-svg-viewer'); ?>
                         </label>
                         <p class="description">
-                            <?php esc_html_e('Adds a unique suffix to script and style versions so browsers always fetch the latest assets. Useful for local testing; disable for production.', 'svg-viewer'); ?>
+                            <?php esc_html_e('Adds a unique suffix to script and style versions so browsers always fetch the latest assets. Useful for local testing; disable for production.', 'wp-svg-viewer'); ?>
                         </p>
                     </div>
                 </div>
@@ -682,50 +674,50 @@ class SVG_Viewer
                 <div class="svg-viewer-field-group">
                     <div class="svg-viewer-field">
                         <label
-                            for="svg-viewer-default-button-fill"><?php esc_html_e('Button Fill Color', 'svg-viewer'); ?></label>
+                            for="svg-viewer-default-button-fill"><?php esc_html_e('Button Fill Color', 'wp-svg-viewer'); ?></label>
                         <input type="text" id="svg-viewer-default-button-fill" name="svg_viewer_button_fill"
                             class="svg-viewer-color-field" value="<?php echo esc_attr($defaults['button_fill']); ?>"
                             data-default-color="#0073aa" />
                         <p class="description">
-                            <?php esc_html_e('Choose the primary color for the control buttons. Leave blank to use the default.', 'svg-viewer'); ?>
+                            <?php esc_html_e('Choose the primary color for the control buttons. Leave blank to use the default.', 'wp-svg-viewer'); ?>
                         </p>
                     </div>
                     <div class="svg-viewer-field">
                         <label
-                            for="svg-viewer-default-button-border"><?php esc_html_e('Button Border Color', 'svg-viewer'); ?></label>
+                            for="svg-viewer-default-button-border"><?php esc_html_e('Button Border Color', 'wp-svg-viewer'); ?></label>
                         <input type="text" id="svg-viewer-default-button-border" name="svg_viewer_button_border"
                             class="svg-viewer-color-field" value="<?php echo esc_attr($defaults['button_border']); ?>"
                             data-default-color="#0073aa" />
                         <p class="description">
-                            <?php esc_html_e('Set the border color for the control buttons. Leave blank to match the fill color.', 'svg-viewer'); ?>
+                            <?php esc_html_e('Set the border color for the control buttons. Leave blank to match the fill color.', 'wp-svg-viewer'); ?>
                         </p>
                     </div>
                     <div class="svg-viewer-field">
                         <label
-                            for="svg-viewer-default-button-foreground"><?php esc_html_e('Button Foreground Color', 'svg-viewer'); ?></label>
+                            for="svg-viewer-default-button-foreground"><?php esc_html_e('Button Foreground Color', 'wp-svg-viewer'); ?></label>
                         <input type="text" id="svg-viewer-default-button-foreground" name="svg_viewer_button_foreground"
                             class="svg-viewer-color-field" value="<?php echo esc_attr($defaults['button_foreground']); ?>"
                             data-default-color="#ffffff" />
                         <p class="description">
-                            <?php esc_html_e('Set the icon and text color for the control buttons. Leave blank to use the default.', 'svg-viewer'); ?>
+                            <?php esc_html_e('Set the icon and text color for the control buttons. Leave blank to use the default.', 'wp-svg-viewer'); ?>
                         </p>
                     </div>
                 </div>
 
                 <div class="svg-viewer-field">
-                    <label for="svg-viewer-default-title"><?php esc_html_e('Title (optional)', 'svg-viewer'); ?></label>
+                    <label for="svg-viewer-default-title"><?php esc_html_e('Title (optional)', 'wp-svg-viewer'); ?></label>
                     <input type="text" id="svg-viewer-default-title" name="svg_viewer_title"
                         value="<?php echo esc_attr($defaults['title']); ?>" />
                 </div>
 
                 <div class="svg-viewer-field">
-                    <label for="svg-viewer-default-caption"><?php esc_html_e('Caption (optional)', 'svg-viewer'); ?></label>
+                    <label for="svg-viewer-default-caption"><?php esc_html_e('Caption (optional)', 'wp-svg-viewer'); ?></label>
                     <textarea id="svg-viewer-default-caption" name="svg_viewer_caption" rows="3"
                         class="widefat"><?php echo esc_textarea($defaults['caption']); ?></textarea>
-                    <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'svg-viewer'); ?></p>
+                    <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'wp-svg-viewer'); ?></p>
                 </div>
             </div>
-            <?php submit_button(__('Save Default Options', 'svg-viewer')); ?>
+            <?php submit_button(__('Save Default Options', 'wp-svg-viewer')); ?>
         </form>
         <?php
     }
@@ -787,11 +779,11 @@ class SVG_Viewer
     public function handle_save_default_options()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to perform this action.', 'svg-viewer'));
+            wp_die(esc_html__('You do not have permission to perform this action.', 'wp-svg-viewer'));
         }
 
         if (!isset($_POST['svg_viewer_defaults_nonce']) || !wp_verify_nonce($_POST['svg_viewer_defaults_nonce'], 'svg_viewer_save_defaults')) {
-            wp_die(esc_html__('Security check failed. Please try again.', 'svg-viewer'));
+            wp_die(esc_html__('Security check failed. Please try again.', 'wp-svg-viewer'));
         }
 
         $input_keys = array(
@@ -930,11 +922,12 @@ class SVG_Viewer
             $preset_data = $this->get_preset_settings($preset_id);
 
             if (!$preset_data) {
+                /* translators: %s: Requested preset ID. */
                 $error_message = sprintf(
                     '<div style="color: red; padding: 10px; border: 1px solid red;">%s</div>',
                     esc_html(
                         sprintf(
-                            __('Error: SVG preset not found for ID %s.', 'svg-viewer'),
+                            __('Error: SVG preset not found for ID %s.', 'wp-svg-viewer'),
                             $atts['id']
                         )
                     )
@@ -986,7 +979,7 @@ class SVG_Viewer
                 '<div style="color: red; padding: 10px; border: 1px solid red;">%s</div>',
                 esc_html__(
                     'Error: SVG source not specified. Use [svg_viewer src="path/to/file.svg"]',
-                    'svg-viewer'
+                    'wp-svg-viewer'
                 )
             );
             return $error_message;
@@ -998,7 +991,7 @@ class SVG_Viewer
         if (!$svg_url) {
             $error_message = sprintf(
                 '<div style="color: red; padding: 10px; border: 1px solid red;">%s</div>',
-                esc_html__('Error: Invalid SVG path.', 'svg-viewer')
+                esc_html__('Error: Invalid SVG path.', 'wp-svg-viewer')
             );
             return $error_message;
         }
@@ -1098,7 +1091,7 @@ class SVG_Viewer
             <?php endif; ?>
             <div class="<?php echo esc_attr($main_class_attribute); ?>" data-viewer="<?php echo esc_attr($viewer_id); ?>">
                 <?php if ($controls_markup !== ''): ?>
-                    <?php echo $controls_markup; ?>
+                    <?php echo wp_kses_post($controls_markup); ?>
                 <?php endif; ?>
                 <div class="svg-container" style="height: <?php echo esc_attr($atts['height']); ?>"
                     data-viewer="<?php echo esc_attr($viewer_id); ?>">
@@ -1125,8 +1118,8 @@ class SVG_Viewer
                 // Initialize viewer when ready
                 function initViewer() {
                     if (typeof SVGViewer !== 'undefined') {
-                        window.svgViewerInstances['<?php echo $viewer_id; ?>'] = new SVGViewer({
-                            viewerId: '<?php echo $viewer_id; ?>',
+                        window.svgViewerInstances['<?php echo esc_js($viewer_id); ?>'] = new SVGViewer({
+                            viewerId: '<?php echo esc_js($viewer_id); ?>',
                             svgUrl: '<?php echo esc_url($svg_url); ?>',
                             initialZoom: <?php echo json_encode($initial_zoom); ?>,
                             minZoom: <?php echo json_encode($min_zoom); ?>,
@@ -1180,18 +1173,18 @@ class SVG_Viewer
     public function register_preset_post_type()
     {
         $labels = array(
-            'name' => __('SVG Viewer Presets', 'svg-viewer'),
-            'singular_name' => __('SVG Viewer Preset', 'svg-viewer'),
-            'menu_name' => __('SVG Viewer', 'svg-viewer'),
-            'add_new' => __('Add New Preset', 'svg-viewer'),
-            'add_new_item' => __('Add New SVG Viewer Preset', 'svg-viewer'),
-            'edit_item' => __('Edit SVG Viewer Preset', 'svg-viewer'),
-            'new_item' => __('New SVG Viewer Preset', 'svg-viewer'),
-            'view_item' => __('View SVG Viewer Preset', 'svg-viewer'),
-            'search_items' => __('Search SVG Viewer Presets', 'svg-viewer'),
-            'not_found' => __('No presets found', 'svg-viewer'),
-            'not_found_in_trash' => __('No presets found in trash', 'svg-viewer'),
-            'all_items' => __('SVG Viewer Presets', 'svg-viewer'),
+            'name' => __('SVG Viewer Presets', 'wp-svg-viewer'),
+            'singular_name' => __('SVG Viewer Preset', 'wp-svg-viewer'),
+            'menu_name' => __('SVG Viewer', 'wp-svg-viewer'),
+            'add_new' => __('Add New Preset', 'wp-svg-viewer'),
+            'add_new_item' => __('Add New SVG Viewer Preset', 'wp-svg-viewer'),
+            'edit_item' => __('Edit SVG Viewer Preset', 'wp-svg-viewer'),
+            'new_item' => __('New SVG Viewer Preset', 'wp-svg-viewer'),
+            'view_item' => __('View SVG Viewer Preset', 'wp-svg-viewer'),
+            'search_items' => __('Search SVG Viewer Presets', 'wp-svg-viewer'),
+            'not_found' => __('No presets found', 'wp-svg-viewer'),
+            'not_found_in_trash' => __('No presets found in trash', 'wp-svg-viewer'),
+            'all_items' => __('SVG Viewer Presets', 'wp-svg-viewer'),
         );
 
         $args = array(
@@ -1264,12 +1257,12 @@ class SVG_Viewer
 
         wp_localize_script('svg-viewer-admin', 'svgViewerAdmin', array(
             'i18n' => array(
-                'missingSrc' => __('Please select an SVG before loading the preview.', 'svg-viewer'),
-                'captureSaved' => __('Captured viewer state from the preview.', 'svg-viewer'),
-                'captureFailed' => __('Unable to capture the current state. Refresh the preview and try again.', 'svg-viewer'),
-                'copySuccess' => __('Shortcode copied to clipboard.', 'svg-viewer'),
-                'copyFailed' => __('Press ⌘/Ctrl+C to copy the shortcode.', 'svg-viewer'),
-                'fullCopySuccess' => __('Full shortcode copied to clipboard.', 'svg-viewer'),
+                'missingSrc' => __('Please select an SVG before loading the preview.', 'wp-svg-viewer'),
+                'captureSaved' => __('Captured viewer state from the preview.', 'wp-svg-viewer'),
+                'captureFailed' => __('Unable to capture the current state. Refresh the preview and try again.', 'wp-svg-viewer'),
+                'copySuccess' => __('Shortcode copied to clipboard.', 'wp-svg-viewer'),
+                'copyFailed' => __('Press ⌘/Ctrl+C to copy the shortcode.', 'wp-svg-viewer'),
+                'fullCopySuccess' => __('Full shortcode copied to clipboard.', 'wp-svg-viewer'),
             ),
             'controls' => array(
                 'buttons' => $button_definitions,
@@ -1286,7 +1279,7 @@ class SVG_Viewer
     {
         add_meta_box(
             'svg-viewer-preset-settings',
-            __('SVG Viewer Settings', 'svg-viewer'),
+            __('SVG Viewer Settings', 'wp-svg-viewer'),
             array($this, 'render_preset_meta_box'),
             'svg_viewer_preset',
             'normal',
@@ -1404,16 +1397,16 @@ class SVG_Viewer
                 <button type="button" class="svg-viewer-tab-button is-active" role="tab"
                     id="<?php echo esc_attr($settings_panel_id); ?>-tab"
                     aria-controls="<?php echo esc_attr($settings_panel_id); ?>" aria-selected="true" data-tab-target="settings">
-                    <?php esc_html_e('Settings', 'svg-viewer'); ?>
+                    <?php esc_html_e('Settings', 'wp-svg-viewer'); ?>
                 </button>
                 <button type="button" class="svg-viewer-tab-button" role="tab" id="<?php echo esc_attr($help_panel_id); ?>-tab"
                     aria-controls="<?php echo esc_attr($help_panel_id); ?>" aria-selected="false" data-tab-target="help">
-                    <?php esc_html_e('Help', 'svg-viewer'); ?>
+                    <?php esc_html_e('Help', 'wp-svg-viewer'); ?>
                 </button>
                 <button type="button" class="svg-viewer-tab-button" role="tab"
                     id="<?php echo esc_attr($changes_panel_id); ?>-tab"
                     aria-controls="<?php echo esc_attr($changes_panel_id); ?>" aria-selected="false" data-tab-target="changes">
-                    <?php esc_html_e('Changes', 'svg-viewer'); ?>
+                    <?php esc_html_e('Changes', 'wp-svg-viewer'); ?>
                 </button>
             </div>
             <div class="svg-viewer-tab-panels">
@@ -1422,32 +1415,32 @@ class SVG_Viewer
                     <div class="svg-viewer-admin-meta" data-viewer-id="<?php echo esc_attr($viewer_id); ?>"
                         data-preset-id="<?php echo esc_attr($post->ID); ?>">
                         <div class="svg-viewer-shortcode-display">
-                            <label for="svg-viewer-shortcode"><?php esc_html_e('Preset Shortcode', 'svg-viewer'); ?></label>
+                            <label for="svg-viewer-shortcode"><?php esc_html_e('Preset Shortcode', 'wp-svg-viewer'); ?></label>
                             <div class="svg-shortcode-wrap">
                                 <input type="text" id="svg-viewer-shortcode" class="svg-shortcode-input" readonly
                                     value="<?php echo esc_attr($shortcode); ?>">
                                 <button type="button" class="button svg-shortcode-copy"
                                     data-shortcode="<?php echo esc_attr($shortcode); ?>">
-                                    <?php esc_html_e('Copy', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Copy', 'wp-svg-viewer'); ?>
                                 </button>
                                 <button type="button" class="button svg-shortcode-full">
-                                    <?php esc_html_e('Full Shortcode', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Full Shortcode', 'wp-svg-viewer'); ?>
                                 </button>
                                 <span class="svg-shortcode-status" aria-live="polite"></span>
                             </div>
                             <p class="description">
-                                <?php esc_html_e('Use this shortcode in pages or posts to embed this preset.', 'svg-viewer'); ?>
+                                <?php esc_html_e('Use this shortcode in pages or posts to embed this preset.', 'wp-svg-viewer'); ?>
                             </p>
                         </div>
 
                         <div class="svg-viewer-field">
-                            <label for="svg-viewer-src"><?php esc_html_e('SVG Source URL', 'svg-viewer'); ?></label>
+                            <label for="svg-viewer-src"><?php esc_html_e('SVG Source URL', 'wp-svg-viewer'); ?></label>
                             <div class="svg-viewer-media-control">
                                 <input type="text" id="svg-viewer-src" name="svg_viewer_src"
                                     value="<?php echo esc_attr($values['src']); ?>"
-                                    placeholder="<?php esc_attr_e('https://example.com/my-graphic.svg or uploads/2025/graphic.svg', 'svg-viewer'); ?>" />
+                                    placeholder="<?php esc_attr_e('https://example.com/my-graphic.svg or uploads/2025/graphic.svg', 'wp-svg-viewer'); ?>" />
                                 <button type="button"
-                                    class="button svg-viewer-select-media"><?php esc_html_e('Select SVG', 'svg-viewer'); ?></button>
+                                    class="button svg-viewer-select-media"><?php esc_html_e('Select SVG', 'wp-svg-viewer'); ?></button>
                             </div>
                             <input type="hidden" name="svg_viewer_attachment_id"
                                 value="<?php echo esc_attr($values['attachment_id']); ?>" />
@@ -1455,29 +1448,29 @@ class SVG_Viewer
 
                         <div class="svg-viewer-field-group">
                             <div class="svg-viewer-field">
-                                <label for="svg-viewer-height"><?php esc_html_e('Viewer Height', 'svg-viewer'); ?></label>
+                                <label for="svg-viewer-height"><?php esc_html_e('Viewer Height', 'wp-svg-viewer'); ?></label>
                                 <input type="text" id="svg-viewer-height" name="svg_viewer_height"
                                     value="<?php echo esc_attr($values['height']); ?>" placeholder="600px" />
                             </div>
                             <div class="svg-viewer-field">
-                                <label for="svg-viewer-min-zoom"><?php esc_html_e('Min Zoom (%)', 'svg-viewer'); ?></label>
+                                <label for="svg-viewer-min-zoom"><?php esc_html_e('Min Zoom (%)', 'wp-svg-viewer'); ?></label>
                                 <input type="number" id="svg-viewer-min-zoom" name="svg_viewer_min_zoom"
                                     value="<?php echo esc_attr($values['min_zoom']); ?>" min="1" step="1" />
                             </div>
                             <div class="svg-viewer-field">
-                                <label for="svg-viewer-max-zoom"><?php esc_html_e('Max Zoom (%)', 'svg-viewer'); ?></label>
+                                <label for="svg-viewer-max-zoom"><?php esc_html_e('Max Zoom (%)', 'wp-svg-viewer'); ?></label>
                                 <input type="number" id="svg-viewer-max-zoom" name="svg_viewer_max_zoom"
                                     value="<?php echo esc_attr($values['max_zoom']); ?>" min="1" step="1" />
                             </div>
                             <div class="svg-viewer-field">
                                 <label
-                                    for="svg-viewer-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'svg-viewer'); ?></label>
+                                    for="svg-viewer-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'wp-svg-viewer'); ?></label>
                                 <input type="number" id="svg-viewer-initial-zoom" name="svg_viewer_initial_zoom"
                                     value="<?php echo esc_attr($values['initial_zoom']); ?>" min="1" step="1" />
                             </div>
                             <div class="svg-viewer-field">
                                 <label
-                                    for="svg-viewer-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'svg-viewer'); ?></label>
+                                    for="svg-viewer-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'wp-svg-viewer'); ?></label>
                                 <input type="number" id="svg-viewer-zoom-step" name="svg_viewer_zoom_step"
                                     value="<?php echo esc_attr($values['zoom_step']); ?>" min="0.1" step="0.1" />
                             </div>
@@ -1485,12 +1478,12 @@ class SVG_Viewer
 
                         <div class="svg-viewer-field-group">
                             <div class="svg-viewer-field">
-                                <label for="svg-viewer-center-x"><?php esc_html_e('Center X', 'svg-viewer'); ?></label>
+                                <label for="svg-viewer-center-x"><?php esc_html_e('Center X', 'wp-svg-viewer'); ?></label>
                                 <input type="number" id="svg-viewer-center-x" name="svg_viewer_center_x"
                                     value="<?php echo esc_attr($values['center_x']); ?>" step="0.01" />
                             </div>
                             <div class="svg-viewer-field">
-                                <label for="svg-viewer-center-y"><?php esc_html_e('Center Y', 'svg-viewer'); ?></label>
+                                <label for="svg-viewer-center-y"><?php esc_html_e('Center Y', 'wp-svg-viewer'); ?></label>
                                 <input type="number" id="svg-viewer-center-y" name="svg_viewer_center_y"
                                     value="<?php echo esc_attr($values['center_y']); ?>" step="0.01" />
                             </div>
@@ -1499,14 +1492,14 @@ class SVG_Viewer
                         <div class="svg-viewer-field-group">
                             <div class="svg-viewer-field">
                                 <label
-                                    for="svg-viewer-controls-position"><?php esc_html_e('Controls Position', 'svg-viewer'); ?></label>
+                                    for="svg-viewer-controls-position"><?php esc_html_e('Controls Position', 'wp-svg-viewer'); ?></label>
                                 <select id="svg-viewer-controls-position" name="svg_viewer_controls_position">
                                     <?php
                                     $positions_options = array(
-                                        'top' => __('Top', 'svg-viewer'),
-                                        'bottom' => __('Bottom', 'svg-viewer'),
-                                        'left' => __('Left', 'svg-viewer'),
-                                        'right' => __('Right', 'svg-viewer'),
+                                        'top' => __('Top', 'wp-svg-viewer'),
+                                        'bottom' => __('Bottom', 'wp-svg-viewer'),
+                                        'left' => __('Left', 'wp-svg-viewer'),
+                                        'right' => __('Right', 'wp-svg-viewer'),
                                     );
                                     foreach ($positions_options as $pos_value => $label):
                                         ?>
@@ -1518,23 +1511,24 @@ class SVG_Viewer
                             </div>
                             <div class="svg-viewer-field">
                                 <label
-                                    for="svg-viewer-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'svg-viewer'); ?></label>
+                                    for="svg-viewer-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'wp-svg-viewer'); ?></label>
                                 <input type="text" id="svg-viewer-controls-buttons" name="svg_viewer_controls_buttons"
                                     value="<?php echo esc_attr($values['controls_buttons']); ?>" placeholder="both" />
                                 <p class="description">
-                                    <?php esc_html_e('Combine multiple options with commas. Examples: both, icon, text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Combine multiple options with commas. Examples: both, icon, text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords', 'wp-svg-viewer'); ?>
                                 </p>
                             </div>
                         </div>
 
                         <div class="svg-viewer-field-group">
                             <div class="svg-viewer-field">
-                                <label for="svg-viewer-pan-mode"><?php esc_html_e('Pan Interaction', 'svg-viewer'); ?></label>
+                                <label
+                                    for="svg-viewer-pan-mode"><?php esc_html_e('Pan Interaction', 'wp-svg-viewer'); ?></label>
                                 <select id="svg-viewer-pan-mode" name="svg_viewer_pan_mode">
                                     <?php
                                     $pan_options = array(
-                                        'scroll' => __('Scroll (default)', 'svg-viewer'),
-                                        'drag' => __('Drag to pan', 'svg-viewer'),
+                                        'scroll' => __('Scroll (default)', 'wp-svg-viewer'),
+                                        'drag' => __('Drag to pan', 'wp-svg-viewer'),
                                     );
                                     foreach ($pan_options as $pan_value => $pan_label):
                                         ?>
@@ -1544,17 +1538,18 @@ class SVG_Viewer
                                     <?php endforeach; ?>
                                 </select>
                                 <p class="description">
-                                    <?php esc_html_e('Choose how visitors move around the SVG. Drag temporarily replaces scroll when required by other settings.', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Choose how visitors move around the SVG. Drag temporarily replaces scroll when required by other settings.', 'wp-svg-viewer'); ?>
                                 </p>
                             </div>
                             <div class="svg-viewer-field">
-                                <label for="svg-viewer-zoom-mode"><?php esc_html_e('Zoom Interaction', 'svg-viewer'); ?></label>
+                                <label
+                                    for="svg-viewer-zoom-mode"><?php esc_html_e('Zoom Interaction', 'wp-svg-viewer'); ?></label>
                                 <select id="svg-viewer-zoom-mode" name="svg_viewer_zoom_mode">
                                     <?php
                                     $zoom_options = array(
-                                        'super_scroll' => __('Cmd/Ctrl-scroll (default)', 'svg-viewer'),
-                                        'scroll' => __('Scroll wheel (no modifier)', 'svg-viewer'),
-                                        'click' => __('Modifier click', 'svg-viewer'),
+                                        'super_scroll' => __('Cmd/Ctrl-scroll (default)', 'wp-svg-viewer'),
+                                        'scroll' => __('Scroll wheel (no modifier)', 'wp-svg-viewer'),
+                                        'click' => __('Modifier click', 'wp-svg-viewer'),
                                     );
                                     foreach ($zoom_options as $zoom_value => $zoom_label):
                                         ?>
@@ -1564,7 +1559,7 @@ class SVG_Viewer
                                     <?php endforeach; ?>
                                 </select>
                                 <p class="description">
-                                    <?php esc_html_e('Scroll wheel zoom overrides pan-on-scroll. Cmd/Ctrl-click zooms in and Option/Alt-click zooms out when using modifier click.', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Scroll wheel zoom overrides pan-on-scroll. Cmd/Ctrl-click zooms in and Option/Alt-click zooms out when using modifier click.', 'wp-svg-viewer'); ?>
                                 </p>
                             </div>
                         </div>
@@ -1572,55 +1567,55 @@ class SVG_Viewer
                         <div class="svg-viewer-field-group">
                             <div class="svg-viewer-field">
                                 <label
-                                    for="svg-viewer-button-fill"><?php esc_html_e('Button Fill Color', 'svg-viewer'); ?></label>
+                                    for="svg-viewer-button-fill"><?php esc_html_e('Button Fill Color', 'wp-svg-viewer'); ?></label>
                                 <input type="text" id="svg-viewer-button-fill" name="svg_viewer_button_fill"
                                     class="svg-viewer-color-field" value="<?php echo esc_attr($values['button_fill']); ?>"
                                     data-default-color="#0073aa" />
                                 <p class="description">
-                                    <?php esc_html_e('Choose the primary color for the control buttons. Leave blank to use the default.', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Choose the primary color for the control buttons. Leave blank to use the default.', 'wp-svg-viewer'); ?>
                                 </p>
                             </div>
                             <div class="svg-viewer-field">
                                 <label
-                                    for="svg-viewer-button-border"><?php esc_html_e('Button Border Color', 'svg-viewer'); ?></label>
+                                    for="svg-viewer-button-border"><?php esc_html_e('Button Border Color', 'wp-svg-viewer'); ?></label>
                                 <input type="text" id="svg-viewer-button-border" name="svg_viewer_button_border"
                                     class="svg-viewer-color-field" value="<?php echo esc_attr($values['button_border']); ?>"
                                     data-default-color="#0073aa" />
                                 <p class="description">
-                                    <?php esc_html_e('Set the border color for the control buttons. Leave blank to match the fill color.', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Set the border color for the control buttons. Leave blank to match the fill color.', 'wp-svg-viewer'); ?>
                                 </p>
                             </div>
                             <div class="svg-viewer-field">
                                 <label
-                                    for="svg-viewer-button-foreground"><?php esc_html_e('Button Foreground Color', 'svg-viewer'); ?></label>
+                                    for="svg-viewer-button-foreground"><?php esc_html_e('Button Foreground Color', 'wp-svg-viewer'); ?></label>
                                 <input type="text" id="svg-viewer-button-foreground" name="svg_viewer_button_foreground"
                                     class="svg-viewer-color-field" value="<?php echo esc_attr($values['button_foreground']); ?>"
                                     data-default-color="#ffffff" />
                                 <p class="description">
-                                    <?php esc_html_e('Set the icon and text color for the control buttons. Leave blank to use the default.', 'svg-viewer'); ?>
+                                    <?php esc_html_e('Set the icon and text color for the control buttons. Leave blank to use the default.', 'wp-svg-viewer'); ?>
                                 </p>
                             </div>
                         </div>
 
                         <div class="svg-viewer-field">
-                            <label for="svg-viewer-title"><?php esc_html_e('Title (optional)', 'svg-viewer'); ?></label>
+                            <label for="svg-viewer-title"><?php esc_html_e('Title (optional)', 'wp-svg-viewer'); ?></label>
                             <input type="text" id="svg-viewer-title" name="svg_viewer_title"
                                 value="<?php echo esc_attr($values['title']); ?>" />
                         </div>
 
                         <div class="svg-viewer-field">
-                            <label for="svg-viewer-caption"><?php esc_html_e('Caption (optional)', 'svg-viewer'); ?></label>
+                            <label for="svg-viewer-caption"><?php esc_html_e('Caption (optional)', 'wp-svg-viewer'); ?></label>
                             <textarea id="svg-viewer-caption" name="svg_viewer_caption" rows="3"
                                 class="widefat"><?php echo esc_textarea($values['caption']); ?></textarea>
-                            <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'svg-viewer'); ?></p>
+                            <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'wp-svg-viewer'); ?></p>
                         </div>
 
                         <div class="svg-viewer-admin-preview">
                             <div class="svg-viewer-admin-preview-toolbar">
                                 <button type="button" class="button svg-admin-refresh-preview"
-                                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Load / Refresh Preview', 'svg-viewer'); ?></button>
+                                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Load / Refresh Preview', 'wp-svg-viewer'); ?></button>
                                 <button type="button" class="button button-primary svg-admin-capture-state"
-                                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Use Current View for Initial State', 'svg-viewer'); ?></button>
+                                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php esc_html_e('Use Current View for Initial State', 'wp-svg-viewer'); ?></button>
                                 <span class="svg-admin-status" aria-live="polite"></span>
                             </div>
                             <div class="<?php echo esc_attr($wrapper_class_attribute); ?>"
@@ -1633,7 +1628,7 @@ class SVG_Viewer
                                 <div class="<?php echo esc_attr($main_class_attribute); ?>"
                                     data-viewer="<?php echo esc_attr($viewer_id); ?>">
                                     <?php if ($preview_controls_markup !== ''): ?>
-                                        <?php echo $preview_controls_markup; ?>
+                                        <?php echo wp_kses_post($preview_controls_markup); ?>
                                     <?php endif; ?>
                                     <div class="svg-container" data-viewer="<?php echo esc_attr($viewer_id); ?>"
                                         style="height: <?php echo esc_attr($values['height']); ?>">
@@ -1655,7 +1650,7 @@ class SVG_Viewer
                         if ($help_markup !== '') {
                             echo $help_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         } else {
-                            printf('<p>%s</p>', esc_html__('Help content is not available. Run the "Render Help" build step to regenerate it.', 'svg-viewer'));
+                            printf('<p>%s</p>', esc_html__('Help content is not available. Run the "Render Help" build step to regenerate it.', 'wp-svg-viewer'));
                         }
                         ?>
                     </div>
@@ -1669,7 +1664,7 @@ class SVG_Viewer
                         if ($changelog_markup !== '') {
                             echo $changelog_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         } else {
-                            printf('<p>%s</p>', esc_html__('Changes content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'svg-viewer'));
+                            printf('<p>%s</p>', esc_html__('Changes content is not available. Run the "Render Help/Changelog" build step to regenerate it.', 'wp-svg-viewer'));
                         }
                         ?>
                     </div>
@@ -1784,36 +1779,36 @@ class SVG_Viewer
             'zoom_in' => array(
                 'class' => 'zoom-in-btn',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false"><path fill="currentColor" d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM272 176C258.7 176 248 186.7 248 200L248 248L200 248C186.7 248 176 258.7 176 272C176 285.3 186.7 296 200 296L248 296L248 344C248 357.3 258.7 368 272 368C285.3 368 296 357.3 296 344L296 296L344 296C357.3 296 368 285.3 368 272C368 258.7 357.3 248 344 248L296 248L296 200C296 186.7 285.3 176 272 176z"/></svg>',
-                'text' => __('Zoom In', 'svg-viewer'),
-                'title' => __('Zoom In (Ctrl +)', 'svg-viewer'),
+                'text' => __('Zoom In', 'wp-svg-viewer'),
+                'title' => __('Zoom In (Ctrl +)', 'wp-svg-viewer'),
                 'requires_show_coords' => false,
             ),
             'zoom_out' => array(
                 'class' => 'zoom-out-btn',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false"><path fill="currentColor" d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM200 248C186.7 248 176 258.7 176 272C176 285.3 186.7 296 200 296L344 296C357.3 296 368 285.3 368 272C368 258.7 357.3 248 344 248L200 248z"/></svg>',
-                'text' => __('Zoom Out', 'svg-viewer'),
-                'title' => __('Zoom Out (Ctrl -)', 'svg-viewer'),
+                'text' => __('Zoom Out', 'wp-svg-viewer'),
+                'title' => __('Zoom Out (Ctrl -)', 'wp-svg-viewer'),
                 'requires_show_coords' => false,
             ),
             'reset' => array(
                 'class' => 'reset-zoom-btn',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false"><path fill="currentColor" d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM272 416C351.5 416 416 351.5 416 272C416 192.5 351.5 128 272 128C192.5 128 128 192.5 128 272C128 351.5 192.5 416 272 416z"/></svg>',
-                'text' => __('Reset Zoom', 'svg-viewer'),
-                'title' => __('Reset Zoom', 'svg-viewer'),
+                'text' => __('Reset Zoom', 'wp-svg-viewer'),
+                'title' => __('Reset Zoom', 'wp-svg-viewer'),
                 'requires_show_coords' => false,
             ),
             'center' => array(
                 'class' => 'center-view-btn',
                 'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false"><path fill="currentColor" d="M320 48C337.7 48 352 62.3 352 80L352 98.3C450.1 112.3 527.7 189.9 541.7 288L560 288C577.7 288 592 302.3 592 320C592 337.7 577.7 352 560 352L541.7 352C527.7 450.1 450.1 527.7 352 541.7L352 560C352 577.7 337.7 592 320 592C302.3 592 288 577.7 288 560L288 541.7C189.9 527.7 112.3 450.1 98.3 352L80 352C62.3 352 48 337.7 48 320C48 302.3 62.3 288 80 288L98.3 288C112.3 189.9 189.9 112.3 288 98.3L288 80C288 62.3 302.3 48 320 48zM163.2 352C175.9 414.7 225.3 464.1 288 476.8L288 464C288 446.3 302.3 432 320 432C337.7 432 352 446.3 352 464L352 476.8C414.7 464.1 464.1 414.7 476.8 352L464 352C446.3 352 432 337.7 432 320C432 302.3 446.3 288 464 288L476.8 288C464.1 225.3 414.7 175.9 352 163.2L352 176C352 193.7 337.7 208 320 208C302.3 208 288 193.7 288 176L288 163.2C225.3 175.9 175.9 225.3 163.2 288L176 288C193.7 288 208 302.3 208 320C208 337.7 193.7 352 176 352L163.2 352zM320 272C346.5 272 368 293.5 368 320C368 346.5 346.5 368 320 368C293.5 368 272 346.5 272 320C272 293.5 293.5 272 320 272z"/></svg>',
-                'text' => __('Center View', 'svg-viewer'),
-                'title' => __('Center View', 'svg-viewer'),
+                'text' => __('Center View', 'wp-svg-viewer'),
+                'title' => __('Center View', 'wp-svg-viewer'),
                 'requires_show_coords' => false,
             ),
             'coords' => array(
                 'class' => 'coord-copy-btn',
                 'icon' => '📍',
-                'text' => __('Copy Center', 'svg-viewer'),
-                'title' => __('Copy current center coordinates', 'svg-viewer'),
+                'text' => __('Copy Center', 'wp-svg-viewer'),
+                'title' => __('Copy current center coordinates', 'wp-svg-viewer'),
                 'requires_show_coords' => true,
             ),
         );
@@ -2285,7 +2280,7 @@ class SVG_Viewer
                     <input type="range" class="zoom-slider" data-viewer="<?php echo esc_attr($viewer_id); ?>"
                         min="<?php echo esc_attr($min_zoom_percent); ?>" max="<?php echo esc_attr($max_zoom_percent); ?>"
                         step="<?php echo esc_attr($zoom_step_percent); ?>" value="<?php echo esc_attr($initial_zoom_percent); ?>"
-                        aria-label="<?php esc_attr_e('Zoom level', 'svg-viewer'); ?>"
+                        aria-label="<?php esc_attr_e('Zoom level', 'wp-svg-viewer'); ?>"
                         aria-valuemin="<?php echo esc_attr($min_zoom_percent); ?>"
                         aria-valuemax="<?php echo esc_attr($max_zoom_percent); ?>"
                         aria-valuenow="<?php echo esc_attr($initial_zoom_percent); ?>" />
@@ -2297,7 +2292,8 @@ class SVG_Viewer
                 <button type="button" class="svg-viewer-btn <?php echo esc_attr($definition['class']); ?>"
                     data-viewer="<?php echo esc_attr($viewer_id); ?>" title="<?php echo esc_attr($definition['title']); ?>"
                     aria-label="<?php echo esc_attr($definition['text']); ?>">
-                    <span class="btn-icon" aria-hidden="true"><?php echo $this->sanitize_svg_icon($definition['icon']); ?></span>
+                    <span class="btn-icon"
+                        aria-hidden="true"><?php echo $this->sanitize_svg_icon($definition['icon']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized via wp_kses in sanitize_svg_icon() ?></span>
                     <span class="btn-text"><?php echo esc_html($definition['text']); ?></span>
                 </button>
             <?php endforeach; ?>
@@ -2307,7 +2303,7 @@ class SVG_Viewer
             <div class="divider"></div>
             <span class="zoom-display">
                 <span class="zoom-percentage"
-                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php echo $initial_zoom_percent; ?></span>%
+                    data-viewer="<?php echo esc_attr($viewer_id); ?>"><?php echo esc_html($initial_zoom_percent); ?></span>%
             </span>
         </div>
         <?php
@@ -2363,16 +2359,16 @@ class SVG_Viewer
         }
 
         if ($zoom_mode === 'click') {
-            $messages[] = __('Cmd/Ctrl-click to zoom in, Option/Alt-click to zoom out.', 'svg-viewer');
+            $messages[] = __('Cmd/Ctrl-click to zoom in, Option/Alt-click to zoom out.', 'wp-svg-viewer');
         } elseif ($zoom_mode === 'scroll') {
-            $messages[] = __('Scroll up to zoom in, scroll down to zoom out.', 'svg-viewer');
+            $messages[] = __('Scroll up to zoom in, scroll down to zoom out.', 'wp-svg-viewer');
         }
 
         if ($pan_mode === 'drag') {
             if ($zoom_mode === 'scroll') {
-                $messages[] = __('Drag to pan around the image while scrolling zooms.', 'svg-viewer');
+                $messages[] = __('Drag to pan around the image while scrolling zooms.', 'wp-svg-viewer');
             } else {
-                $messages[] = __('Drag to pan around the image.', 'svg-viewer');
+                $messages[] = __('Drag to pan around the image.', 'wp-svg-viewer');
             }
         }
 
@@ -2577,7 +2573,7 @@ class SVG_Viewer
      */
     public function add_shortcode_column($columns)
     {
-        $columns['svg_viewer_shortcode'] = __('Shortcode', 'svg-viewer');
+        $columns['svg_viewer_shortcode'] = __('Shortcode', 'wp-svg-viewer');
         return $columns;
     }
 
@@ -2596,7 +2592,7 @@ class SVG_Viewer
             <code><?php echo esc_html($shortcode); ?></code>
             <button type="button" class="button button-small svg-shortcode-copy"
                 data-shortcode="<?php echo esc_attr($shortcode); ?>">
-                <?php esc_html_e('Copy', 'svg-viewer'); ?>
+                <?php esc_html_e('Copy', 'wp-svg-viewer'); ?>
             </button>
             <span class="svg-shortcode-status" aria-live="polite"></span>
         </div>

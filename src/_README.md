@@ -17,6 +17,7 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
   - [Fields](#fields)
   - [Preview Pane](#preview-pane)
   - [Preset Shortcodes](#preset-shortcodes)
+  - [Defaults Tab](#defaults-tab)
 - [Using Presets in Posts/Pages](#using-presets-in-postspages)
 - [Preview Workflow](#preview-workflow)
 - [Examples](#examples)
@@ -25,7 +26,7 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
   - [SVG Preparation](#svg-preparation)
   - [Common Issues](#common-issues)
   - [Debugging](#debugging)
-- [Changelog Highlights (1.0.1)](#changelog-highlights-101)
+- [Changelog Highlights (1.1.0)](#changelog-highlights-110)
 - [License \& Credits](#license--credits)
 
 ---
