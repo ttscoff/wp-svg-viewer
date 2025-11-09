@@ -1,3 +1,11 @@
+### 1.0.10
+
+2025-11-09 13:24
+
+#### IMPROVED
+
+- Add plugins page settings link
+
 ### 1.0.9
 
 2025-11-09 11:20
