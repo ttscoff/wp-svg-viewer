@@ -189,6 +189,18 @@
     transform 0.1s ease;
   white-space: nowrap;
 }
+.svg-viewer-btn.is-disabled,
+.svg-viewer-btn:disabled {
+  background-color: #c9ccd1;
+  border-color: #b2b5ba;
+  color: #f1f1f1;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+.svg-viewer-btn.is-disabled:hover,
+.svg-viewer-btn:disabled:hover {
+  background-color: #c9ccd1;
+}
 
 .svg-viewer-btn .btn-icon {
   font-size: 16px;

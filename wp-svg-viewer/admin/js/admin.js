@@ -1145,8 +1145,7 @@
     $metaBox
       .find('input[name="svg_viewer_initial_zoom"]')
       .val(zoomPercent.toString());
-    $metaBox.find('input[name="svg_viewer_center_x"]').val(center.x.toFixed(2));
-    $metaBox.find('input[name="svg_viewer_center_y"]').val(center.y.toFixed(2));
+    setCenterFields($metaBox, center);
 
     $status
       .removeClass("error")
@@ -1157,6 +1156,224 @@
     setTimeout(function () {
       $status.text("").removeClass("error");
     }, 4000);
+  }
+
+  function parseSvgDimensionValue(value) {
+    if (value == null) {
+      return null;
+    }
+    if (typeof value === "number") {
+      return isFinite(value) ? value : null;
+    }
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return null;
+      }
+      const match = trimmed.match(/^(-?\d+(?:\.\d+)?)/);
+      if (match) {
+        const parsed = parseFloat(match[1]);
+        return isFinite(parsed) ? parsed : null;
+      }
+    }
+    return null;
+  }
+
+  function computeCenterFromDimensions(widthValue, heightValue) {
+    const width = parseSvgDimensionValue(widthValue);
+    const height = parseSvgDimensionValue(heightValue);
+    if (
+      width == null ||
+      height == null ||
+      !isFinite(width) ||
+      !isFinite(height) ||
+      width <= 0 ||
+      height <= 0
+    ) {
+      return null;
+    }
+    return {
+      x: width / 2,
+      y: height / 2,
+    };
+  }
+
+  function computeCenterFromViewBox(viewBoxValue) {
+    if (typeof viewBoxValue !== "string") {
+      return null;
+    }
+    const parts = viewBoxValue
+      .trim()
+      .split(/[\s,]+/)
+      .map(function (part) {
+        return parseFloat(part);
+      });
+    if (parts.length !== 4 || parts.some(function (num) { return !isFinite(num); })) {
+      return null;
+    }
+    const minX = parts[0];
+    const minY = parts[1];
+    const width = parts[2];
+    const height = parts[3];
+    if (width <= 0 || height <= 0) {
+      return null;
+    }
+    return {
+      x: minX + width / 2,
+      y: minY + height / 2,
+    };
+  }
+
+  function setCenterFields($metaBox, center, options = {}) {
+    if (
+      !center ||
+      typeof center.x !== "number" ||
+      typeof center.y !== "number" ||
+      !isFinite(center.x) ||
+      !isFinite(center.y)
+    ) {
+      return;
+    }
+    const $centerX = $metaBox.find('input[name="svg_viewer_center_x"]');
+    const $centerY = $metaBox.find('input[name="svg_viewer_center_y"]');
+    if (!$centerX.length || !$centerY.length) {
+      return;
+    }
+    const formattedX = center.x.toFixed(2);
+    const formattedY = center.y.toFixed(2);
+    $centerX.val(formattedX);
+    $centerY.val(formattedY);
+
+    const viewerId = $metaBox.data("viewerId");
+    if (
+      typeof viewerId === "string" &&
+      viewerId.length &&
+      window.svgViewerInstances &&
+      window.svgViewerInstances[viewerId] &&
+      typeof window.svgViewerInstances[viewerId].setManualCenter === "function"
+    ) {
+      window.svgViewerInstances[viewerId].setManualCenter(center.x, center.y, {
+        recenter: Boolean(options.recenterViewer),
+      });
+    }
+  }
+
+  function extractCenterFromAttachmentData(attachmentData) {
+    if (!attachmentData || typeof attachmentData !== "object") {
+      return null;
+    }
+
+    const candidates = [];
+    candidates.push(attachmentData);
+    if (attachmentData.meta && typeof attachmentData.meta === "object") {
+      candidates.push(attachmentData.meta);
+      if (attachmentData.meta.svg_meta && typeof attachmentData.meta.svg_meta === "object") {
+        candidates.push(attachmentData.meta.svg_meta);
+      }
+      if (attachmentData.meta.svg && typeof attachmentData.meta.svg === "object") {
+        candidates.push(attachmentData.meta.svg);
+      }
+    }
+
+    for (let i = 0; i < candidates.length; i += 1) {
+      const candidate = candidates[i];
+      if (!candidate || typeof candidate !== "object") {
+        continue;
+      }
+      const viewBoxCenter = computeCenterFromViewBox(
+        candidate.viewBox || candidate.viewbox || candidate.view_box
+      );
+      if (viewBoxCenter) {
+        return viewBoxCenter;
+      }
+      const dimensionCenter = computeCenterFromDimensions(
+        candidate.width,
+        candidate.height
+      );
+      if (dimensionCenter) {
+        return dimensionCenter;
+      }
+    }
+
+    return null;
+  }
+
+  function fetchSvgCenter(url) {
+    if (
+      !url ||
+      typeof window.fetch !== "function" ||
+      typeof window.DOMParser === "undefined"
+    ) {
+      return Promise.resolve(null);
+    }
+    let fetchOptions = {};
+    try {
+      const parsedUrl = new URL(url, window.location.href);
+      if (parsedUrl.origin === window.location.origin) {
+        fetchOptions = { credentials: "same-origin" };
+      } else {
+        fetchOptions = { credentials: "include", mode: "cors" };
+      }
+    } catch (err) {
+      fetchOptions = { credentials: "same-origin" };
+    }
+
+    return fetch(url, fetchOptions)
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("SVG fetch failed");
+        }
+        return response.text();
+      })
+      .then(function (svgText) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(svgText, "image/svg+xml");
+        if (!doc || !doc.documentElement) {
+          return null;
+        }
+        if (
+          doc.getElementsByTagName("parsererror").length &&
+          doc.getElementsByTagName("parsererror").length > 0
+        ) {
+          return null;
+        }
+        const svgEl = doc.documentElement;
+        if (!svgEl || svgEl.nodeName.toLowerCase() !== "svg") {
+          return null;
+        }
+        const viewBoxCenter = computeCenterFromViewBox(
+          svgEl.getAttribute("viewBox") || svgEl.getAttribute("viewbox")
+        );
+        if (viewBoxCenter) {
+          return viewBoxCenter;
+        }
+        return computeCenterFromDimensions(
+          svgEl.getAttribute("width"),
+          svgEl.getAttribute("height")
+        );
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  function autoPopulateCenterFields($metaBox, attachmentData) {
+    const metadataCenter = extractCenterFromAttachmentData(attachmentData);
+    if (metadataCenter) {
+      setCenterFields($metaBox, metadataCenter);
+      return;
+    }
+    const svgUrl =
+      (attachmentData && attachmentData.url) ||
+      getFieldValue($metaBox, 'input[name="svg_viewer_src"]', "");
+    if (!svgUrl) {
+      return;
+    }
+    fetchSvgCenter(svgUrl).then(function (center) {
+      if (center) {
+        setCenterFields($metaBox, center);
+      }
+    });
   }
 
   function bindMediaSelector($metaBox) {
@@ -1191,6 +1408,7 @@
         if (data.id) {
           $metaBox.find('input[name="svg_viewer_attachment_id"]').val(data.id);
         }
+        autoPopulateCenterFields($metaBox, data);
       });
 
       mediaFrame.open();

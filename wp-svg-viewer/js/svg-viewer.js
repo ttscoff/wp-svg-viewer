@@ -81,6 +81,20 @@ class SVGViewer {
     this.coordOutputEl = this.wrapper.querySelector(
       '[data-viewer="' + this.viewerId + '"].coord-output'
     );
+    this.zoomInButtons = this.wrapper
+      ? Array.from(
+          this.wrapper.querySelectorAll(
+            '[data-viewer="' + this.viewerId + '"].zoom-in-btn'
+          )
+        )
+      : [];
+    this.zoomOutButtons = this.wrapper
+      ? Array.from(
+          this.wrapper.querySelectorAll(
+            '[data-viewer="' + this.viewerId + '"].zoom-out-btn'
+          )
+        )
+      : [];
     this.zoomSliderEls = this.wrapper
       ? Array.from(
           this.wrapper.querySelectorAll(
@@ -120,17 +134,17 @@ class SVGViewer {
 
   setupEventListeners() {
     // Button clicks
-    this.wrapper
-      .querySelectorAll('[data-viewer="' + this.viewerId + '"].zoom-in-btn')
-      .forEach((btn) => {
+    if (this.zoomInButtons && this.zoomInButtons.length) {
+      this.zoomInButtons.forEach((btn) => {
         btn.addEventListener("click", () => this.zoomIn());
       });
+    }
 
-    this.wrapper
-      .querySelectorAll('[data-viewer="' + this.viewerId + '"].zoom-out-btn')
-      .forEach((btn) => {
+    if (this.zoomOutButtons && this.zoomOutButtons.length) {
+      this.zoomOutButtons.forEach((btn) => {
         btn.addEventListener("click", () => this.zoomOut());
       });
+    }
 
     this.wrapper
       .querySelectorAll('[data-viewer="' + this.viewerId + '"].reset-zoom-btn')
@@ -231,9 +245,15 @@ class SVGViewer {
     }
 
     if (!this.container || !this.viewport) {
+      const minZoomFallback =
+        Number.isFinite(this.MIN_ZOOM) && this.MIN_ZOOM > 0 ? this.MIN_ZOOM : 0;
+      const maxZoomFallback =
+        Number.isFinite(this.MAX_ZOOM) && this.MAX_ZOOM > 0
+          ? this.MAX_ZOOM
+          : newZoom;
       this.currentZoom = Math.max(
-        this.MIN_ZOOM,
-        Math.min(this.MAX_ZOOM, newZoom)
+        minZoomFallback,
+        Math.min(maxZoomFallback, newZoom)
       );
       this.updateZoomDisplay();
       return;
@@ -247,15 +267,15 @@ class SVGViewer {
       this.container.style.transform = "translate3d(0,0,0)";
     }
 
-    if (!this.MIN_ZOOM) {
-      const containerDiag = Math.sqrt(
-        this.container.clientWidth ** 2 + this.container.clientHeight ** 2
-      );
-      const svgDiag = Math.sqrt(
-        this.baseCssDimensions.width ** 2 + this.baseCssDimensions.height ** 2
-      );
-      this.MIN_ZOOM = Math.min(1, containerDiag / svgDiag);
-    }
+    const resolvedMinZoom = this.resolveMinZoom();
+    const effectiveMinZoom =
+      Number.isFinite(resolvedMinZoom) && resolvedMinZoom > 0
+        ? resolvedMinZoom
+        : 0;
+    const effectiveMaxZoom =
+      Number.isFinite(this.MAX_ZOOM) && this.MAX_ZOOM > 0
+        ? this.MAX_ZOOM
+        : Math.max(newZoom, 0);
 
     const focusData =
       options.__focusData && typeof options.__focusData === "object"
@@ -267,8 +287,8 @@ class SVGViewer {
     const focusOffsetY = focusData.focusOffsetY;
 
     this.currentZoom = Math.max(
-      this.MIN_ZOOM,
-      Math.min(this.MAX_ZOOM, newZoom)
+      effectiveMinZoom,
+      Math.min(effectiveMaxZoom, newZoom)
     );
 
     this.updateViewport(options);
@@ -409,14 +429,18 @@ class SVGViewer {
         slider.setAttribute("aria-valuenow", String(sliderValue));
       });
     }
+
+    this.updateZoomButtonState();
   }
 
   zoomIn() {
-    this.setZoom(this.currentZoom + this.ZOOM_STEP, { animate: true });
+    const targetZoom = this.computeZoomTarget("in");
+    this.setZoom(targetZoom, { animate: true });
   }
 
   zoomOut() {
-    this.setZoom(this.currentZoom - this.ZOOM_STEP, { animate: true });
+    const targetZoom = this.computeZoomTarget("out");
+    this.setZoom(targetZoom, { animate: true });
   }
 
   resetZoom() {
@@ -1358,8 +1382,152 @@ class SVGViewer {
       window.prompt("Copy coordinates", message);
     }
   }
-}
 
+  resolveMinZoom() {
+    if (Number.isFinite(this.MIN_ZOOM) && this.MIN_ZOOM > 0) {
+      return this.MIN_ZOOM;
+    }
+    if (
+      !this.container ||
+      !this.baseCssDimensions ||
+      !Number.isFinite(this.baseCssDimensions.width) ||
+      !Number.isFinite(this.baseCssDimensions.height) ||
+      this.baseCssDimensions.width <= 0 ||
+      this.baseCssDimensions.height <= 0
+    ) {
+      return null;
+    }
+    const containerWidth = this.container.clientWidth || 0;
+    const containerHeight = this.container.clientHeight || 0;
+    if (containerWidth <= 0 || containerHeight <= 0) {
+      return null;
+    }
+    const containerDiag = Math.sqrt(
+      containerWidth ** 2 + containerHeight ** 2
+    );
+    const svgDiag = Math.sqrt(
+      this.baseCssDimensions.width ** 2 + this.baseCssDimensions.height ** 2
+    );
+    if (!Number.isFinite(containerDiag) || !Number.isFinite(svgDiag)) {
+      return null;
+    }
+    if (svgDiag <= 0) {
+      return null;
+    }
+    const computedMin = Math.min(1, containerDiag / svgDiag);
+    if (Number.isFinite(computedMin) && computedMin > 0) {
+      this.MIN_ZOOM = computedMin;
+      return this.MIN_ZOOM;
+    }
+    return null;
+  }
+
+  getEffectiveMinZoom() {
+    const resolved = this.resolveMinZoom();
+    if (Number.isFinite(resolved) && resolved > 0) {
+      return resolved;
+    }
+    if (Number.isFinite(this.MIN_ZOOM) && this.MIN_ZOOM > 0) {
+      return this.MIN_ZOOM;
+    }
+    return null;
+  }
+
+  getEffectiveMaxZoom() {
+    if (Number.isFinite(this.MAX_ZOOM) && this.MAX_ZOOM > 0) {
+      return this.MAX_ZOOM;
+    }
+    return this.currentZoom || 1;
+  }
+
+  getZoomStep() {
+    return Number.isFinite(this.ZOOM_STEP) && this.ZOOM_STEP > 0
+      ? this.ZOOM_STEP
+      : 0.1;
+  }
+
+  getZoomTolerance() {
+    const step = this.getZoomStep();
+    return Math.max(1e-4, step / 1000);
+  }
+
+  setManualCenter(x, y, options = {}) {
+    const shouldRecenter = Boolean(options.recenter);
+    if (Number.isFinite(x) && Number.isFinite(y)) {
+      this.manualCenter = { x, y };
+      if (shouldRecenter && this.container && this.baseDimensions) {
+        this.centerView({ focusX: x, focusY: y });
+      }
+      return;
+    }
+
+    this.manualCenter = null;
+    if (shouldRecenter && this.container && this.baseDimensions) {
+      this.centerView();
+    }
+  }
+
+  computeZoomTarget(direction) {
+    const step = this.getZoomStep();
+    const tolerance = this.getZoomTolerance();
+    const maxZoom = this.getEffectiveMaxZoom();
+    const minZoom =
+      this.getEffectiveMinZoom() ?? Math.max(0, this.currentZoom - step);
+
+    if (direction === "in") {
+      const remaining = maxZoom - this.currentZoom;
+      if (remaining <= step + tolerance) {
+        return maxZoom;
+      }
+      return Math.min(maxZoom, this.currentZoom + step);
+    }
+
+    const available = this.currentZoom - minZoom;
+    if (available <= step + tolerance) {
+      return minZoom;
+    }
+    return Math.max(minZoom, this.currentZoom - step);
+  }
+
+  updateZoomButtonState() {
+    if (!Array.isArray(this.zoomInButtons) || !Array.isArray(this.zoomOutButtons)) {
+      return;
+    }
+    const tolerance = this.getZoomTolerance();
+    const maxZoom = this.getEffectiveMaxZoom();
+    const minZoom = this.getEffectiveMinZoom();
+
+    const canZoomIn =
+      maxZoom - this.currentZoom > tolerance && maxZoom > 0;
+    const canZoomOut =
+      minZoom === null
+        ? true
+        : this.currentZoom - minZoom > tolerance;
+
+    this.toggleButtonState(this.zoomInButtons, canZoomIn);
+    this.toggleButtonState(this.zoomOutButtons, canZoomOut);
+  }
+
+  toggleButtonState(buttons, enabled) {
+    if (!Array.isArray(buttons)) {
+      return;
+    }
+    buttons.forEach((button) => {
+      if (!button) {
+        return;
+      }
+      if (enabled) {
+        button.disabled = false;
+        button.classList.remove("is-disabled");
+        button.removeAttribute("aria-disabled");
+      } else {
+        button.disabled = true;
+        button.classList.add("is-disabled");
+        button.setAttribute("aria-disabled", "true");
+      }
+    });
+  }
+}
 // Export for global use
 window.SVGViewer = SVGViewer;
 
