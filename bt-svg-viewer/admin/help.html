@@ -1,4 +1,4 @@
-<h1 id="wpsvgviewer">WP SVG Viewer</h1>
+<h1 id="btsvgviewer">BT SVG Viewer</h1>
 
 <p>Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tools. Recent releases add a visual preset editor, icon-based controls, deeper shortcode options, and configurable button colors.</p>
 
@@ -39,8 +39,8 @@
 </ol>
 
 <ul>
-<li> Download <a href="github.com/ttscoff/wp-svg-viewer/releases/latest/download/wp-svg-viewer.zip">wp-svg-viewer.zip</a>.</li>
-<li> Unzip it locally; you will get a folder named <code>wp-svg-viewer</code>.</li>
+<li> Download <a href="github.com/ttscoff/bt-svg-viewer/releases/latest/download/bt-svg-viewer.zip">bt-svg-viewer.zip</a>.</li>
+<li> Unzip it locally; you will get a folder named <code>bt-svg-viewer</code>.</li>
 </ul>
 
 <ol>
@@ -48,7 +48,7 @@
 </ol>
 
 <ul>
-<li> Copy the entire <code>wp-svg-viewer</code> folder into your WordPress installation at <code>/wp-content/plugins/</code>.</li>
+<li> Copy the entire <code>bt-svg-viewer</code> folder into your WordPress installation at <code>/wp-content/plugins/</code>.</li>
 </ul>
 
 <ol>
@@ -56,7 +56,7 @@
 </ol>
 
 <ul>
-<li> In the WordPress admin, navigate to <strong>Plugins</strong> and click <strong>Activate</strong> on ???SVG Viewer???.</li>
+<li> In the WordPress admin, navigate to <strong>Plugins</strong> and click <strong>Activate</strong> on "BT SVG Viewer".</li>
 </ul>
 
 <hr />
@@ -272,7 +272,7 @@
 
 <h3 id="location">Location</h3>
 
-<p><code>WordPress Dashboard ??? SVG Viewer ??? Presets</code></p>
+<p><code>WordPress Dashboard ??? BT SVG Viewer ??? Presets</code></p>
 
 <h3 id="fields">Fields</h3>
 
@@ -344,7 +344,7 @@
 <h3 id="defaultstab">Defaults Tab</h3>
 
 <ul>
-<li>Visit <strong>SVG Viewer ??? Presets ??? Defaults</strong> to seed the fields used when creating a new preset.</li>
+<li>Visit <strong>BT SVG Viewer ??? Presets ??? Defaults</strong> to seed the fields used when creating a new preset.</li>
 <li>The panel now includes <strong>Enable asset cache busting for debugging</strong>, which appends a time-based suffix to scripts and styles. It is automatically active on hosts that start with <code>dev.</code> or <code>wptest.</code> and can be toggled manually when you need to defeat browser caching.</li>
 </ul>
 
@@ -431,47 +431,47 @@
 <p>Wrapper classes added by the plugin:</p>
 
 <ul>
-<li><code>.svg-viewer-wrapper</code> ??? outer container</li>
-<li><code>.svg-viewer-main</code> ??? wraps controls and SVG container</li>
+<li><code>.bt-svg-viewer-wrapper</code> ??? outer container</li>
+<li><code>.bt-svg-viewer-main</code> ??? wraps controls and SVG container</li>
 <li><code>.svg-controls</code> ??? control bar</li>
 <li><code>.controls-position-{top|bottom|left|right}</code></li>
 <li><code>.controls-mode-{icon|text|both|compact|labels-on-hover|minimal}</code></li>
 <li><code>.controls-align-{alignleft|aligncenter|alignright}</code></li>
-<li><code>.svg-viewer-btn</code>, <code>.btn-icon</code>, <code>.btn-text</code></li>
+<li><code>.bt-svg-viewer-btn</code>, <code>.btn-icon</code>, <code>.btn-text</code></li>
 <li><code>.svg-container</code>, <code>.svg-viewport</code>, <code>.coord-output</code>, <code>.zoom-display</code></li>
 <li><code>.zoom-slider-wrapper</code>, <code>.zoom-slider</code></li>
 </ul>
 
 <p>Button colors are powered by CSS custom properties on the wrapper. Shortcode attributes and preset color pickers set these values, but you can override them manually:</p>
 
-<pre><code class="css">.svg-viewer-wrapper {
-  --svg-viewer-button-fill: #1d4ed8;
-  --svg-viewer-button-border: #1d4ed8;
-  --svg-viewer-button-hover: #1e40af;
-  --svg-viewer-button-text: #ffffff;
-  --svg-viewer-slider-width: 240px;       /* optional: tweak slider width */
+<pre><code class="css">.bt-svg-viewer-wrapper {
+  --bt-svg-viewer-button-fill: #1d4ed8;
+  --bt-svg-viewer-button-border: #1d4ed8;
+  --bt-svg-viewer-button-hover: #1e40af;
+  --bt-svg-viewer-button-text: #ffffff;
+  --bt-svg-viewer-slider-width: 240px;       /* optional: tweak slider width */
 }
 </code></pre>
 
 <p>Example overrides:</p>
 
-<pre><code class="css">.svg-viewer-wrapper.custom-map {
+<pre><code class="css">.bt-svg-viewer-wrapper.custom-map {
   border-radius: 12px;
   overflow: hidden;
 }
 
-.svg-viewer-wrapper.custom-map .svg-controls {
+.bt-svg-viewer-wrapper.custom-map .svg-controls {
   background: #111;
   color: #fff;
   gap: 6px;
 }
 
-.svg-viewer-wrapper.custom-map .svg-viewer-btn {
+.bt-svg-viewer-wrapper.custom-map .bt-svg-viewer-btn {
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.3);
 }
 
-.svg-viewer-wrapper.custom-map .svg-viewer-btn:hover {
+.bt-svg-viewer-wrapper.custom-map .bt-svg-viewer-btn:hover {
   background: rgba(255,255,255,0.25);
 }
 </code></pre>

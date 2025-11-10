@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WP SVG Viewer 1.0.1\n"
+"Project-Id-Version: BT SVG Viewer 1.0.1\n"
 "POT-Creation-Date: 2025-11-08 00:00+0000\n"
 "PO-Revision-Date: 2025-11-08 00:00+0000\n"
 "Last-Translator: \n"
@@ -11,21 +11,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: GPT-5 Codex\n"
-"X-Domain: svg-viewer\n"
+"X-Domain: bt-svg-viewer\n"
 
-#: wp-svg-viewer/admin/js/admin.js:35
+#: bt-svg-viewer/admin/js/admin.js:35
 msgid "Full shortcode copied to clipboard."
 msgstr "Shortcode completo copiato negli appunti."
 
-#: wp-svg-viewer/admin/js/admin.js:1297
+#: bt-svg-viewer/admin/js/admin.js:1297
 msgid "Copy full shortcode"
 msgstr "Copia shortcode completo"
 
-#: wp-svg-viewer/svg-viewer-plugin.php:647
+#: bt-svg-viewer/bt-svg-viewer-plugin.php:647
 msgid "Enable asset cache busting for debugging"
 msgstr "Abilita il cache busting delle risorse per il debug"
 
-#: wp-svg-viewer/svg-viewer-plugin.php:651
+#: bt-svg-viewer/bt-svg-viewer-plugin.php:651
 msgid ""
 "Adds a unique suffix to script and style versions so browsers always fetch "
 "the latest assets. Useful for local testing; disable for production."
@@ -34,22 +34,22 @@ msgstr ""
 "browser scarichino sempre le risorse più recenti. Utile per i test locali; "
 "disabilitalo in produzione."
 
-#: wp-svg-viewer/js/svg-viewer.js:404
+#: bt-svg-viewer/js/bt-svg-viewer.js:404
 msgid "Cmd/Ctrl-click to zoom in, Option/Alt-click to zoom out."
 msgstr ""
 "Cmd/Ctrl-clic per ingrandire, Option/Alt-clic per ridurre."
 
-#: wp-svg-viewer/js/svg-viewer.js:406
+#: bt-svg-viewer/js/bt-svg-viewer.js:406
 msgid "Scroll up to zoom in, scroll down to zoom out."
 msgstr ""
 "Scorri verso l’alto per ingrandire, verso il basso per ridurre."
 
-#: wp-svg-viewer/js/svg-viewer.js:409
+#: bt-svg-viewer/js/bt-svg-viewer.js:409
 msgid "Drag to pan around the image while scrolling zooms."
 msgstr ""
 "Trascina per spostarti nell’immagine mentre lo scorrimento esegue lo zoom."
 
-#: wp-svg-viewer/js/svg-viewer.js:411
+#: bt-svg-viewer/js/bt-svg-viewer.js:411
 msgid "Drag to pan around the image."
 msgstr "Trascina per spostarti nell’immagine."
 
@@ -62,32 +62,32 @@ msgstr "Errore: origine SVG non specificata. Usa [svg_viewer src=\"path/to/file.
 msgid "Error: Invalid SVG path."
 msgstr "Errore: percorso SVG non valido."
 
-msgid "SVG Viewer Presets"
-msgstr "Preset di SVG Viewer"
+msgid "BT SVG Viewer Presets"
+msgstr "Preset di BT SVG Viewer"
 
-msgid "SVG Viewer Preset"
-msgstr "Preset SVG Viewer"
+msgid "BT SVG Viewer Preset"
+msgstr "Preset BT SVG Viewer"
 
-msgid "SVG Viewer"
-msgstr "SVG Viewer"
+msgid "BT SVG Viewer"
+msgstr "BT SVG Viewer"
 
 msgid "Add New Preset"
 msgstr "Aggiungi nuovo preset"
 
-msgid "Add New SVG Viewer Preset"
-msgstr "Aggiungi nuovo preset di SVG Viewer"
+msgid "Add New BT SVG Viewer Preset"
+msgstr "Aggiungi nuovo preset di BT SVG Viewer"
 
-msgid "Edit SVG Viewer Preset"
-msgstr "Modifica preset di SVG Viewer"
+msgid "Edit BT SVG Viewer Preset"
+msgstr "Modifica preset di BT SVG Viewer"
 
-msgid "New SVG Viewer Preset"
-msgstr "Nuovo preset di SVG Viewer"
+msgid "New BT SVG Viewer Preset"
+msgstr "Nuovo preset di BT SVG Viewer"
 
-msgid "View SVG Viewer Preset"
-msgstr "Visualizza preset di SVG Viewer"
+msgid "View BT SVG Viewer Preset"
+msgstr "Visualizza preset di BT SVG Viewer"
 
-msgid "Search SVG Viewer Presets"
-msgstr "Cerca preset di SVG Viewer"
+msgid "Search BT SVG Viewer Presets"
+msgstr "Cerca preset di BT SVG Viewer"
 
 msgid "No presets found"
 msgstr "Nessun preset trovato"
@@ -110,8 +110,8 @@ msgstr "Shortcode copiato negli appunti."
 msgid "Press ⌘/Ctrl+C to copy the shortcode."
 msgstr "Premi ⌘/Ctrl+C per copiare lo shortcode."
 
-msgid "SVG Viewer Settings"
-msgstr "Impostazioni di SVG Viewer"
+msgid "BT SVG Viewer Settings"
+msgstr "Impostazioni di BT SVG Viewer"
 
 msgid "Settings"
 msgstr "Impostazioni"

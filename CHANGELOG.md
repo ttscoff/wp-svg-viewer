@@ -137,7 +137,7 @@
 - Preview in admin panel shows how buttons will appear
 - Preview in admin panel can be panned/zoomed and then its current state can be saved as the initial state for the front-end display
 
-## wp-svg-viewer 1.0.0
+## BT SVG Viewer 1.0.0
 
 2025-11-07 08:00
 

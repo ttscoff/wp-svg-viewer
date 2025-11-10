@@ -1,4 +1,4 @@
-=== SVG Viewer ===
+=== BT SVG Viewer ===
 Contributors: bterp
 Donate link: https://brettterpstra.com/donate/
 Tags: svg, shortcode, maps, zoom, viewer
@@ -13,7 +13,7 @@ A shortcode-powered SVG viewer with reusable presets, zoom, and pan controls.
 
 == Description ==
 
-Embed large, detailed SVG diagrams in WordPress with an accessible viewer that supports touch-friendly zooming, panning, and centering. SVG Viewer keeps maps, technical drawings, and infographics sharp on every screen, while giving editors a visual preset builder so they can reuse configurations without repeating shortcode attributes.
+Embed large, detailed SVG diagrams in WordPress with an accessible viewer that supports touch-friendly zooming, panning, and centering. BT SVG Viewer keeps maps, technical drawings, and infographics sharp on every screen, while giving editors a visual preset builder so they can reuse configurations without repeating shortcode attributes.
 
 = Highlights =
 * Interactive zoom and pan controls with keyboard shortcuts and optional slider mode.
@@ -27,19 +27,19 @@ Embed large, detailed SVG diagrams in WordPress with an accessible viewer that s
 Use the `[svg_viewer]` shortcode anywhere shortcodes are supported. Pass a direct SVG URL or reference a saved preset ID. All shortcode attributes (height, zoom limits, controls layout, button colors, etc.) can be overridden per instance. See the plugin’s admin Help tab or project README for a full attribute reference and examples.
 
 = Preset Workflow =
-Create a preset from **SVG Viewer → Presets** in the admin. Upload an SVG, tune the controls, tweak button colors, then load the preview to dial in the initial zoom and center point. Save the preset and drop the generated `[svg_viewer id="123"]` shortcode wherever you need the viewer. Inline attributes always win over stored preset values, making it easy to reuse a baseline configuration.
+Create a preset from **BT SVG Viewer → Presets** in the admin. Upload an SVG, tune the controls, tweak button colors, then load the preview to dial in the initial zoom and center point. Save the preset and drop the generated `[svg_viewer id="123"]` shortcode wherever you need the viewer. Inline attributes always win over stored preset values, making it easy to reuse a baseline configuration.
 
 == Localization ==
 
 Available translations: German (de_DE), Spanish (es_ES), French (fr_FR), Italian (it_IT).
 
-Translations were initially produced with AI assistance; corrections are welcome via https://github.com/ttscoff/wp-svg-viewer/issues.
+Translations were initially produced with AI assistance; corrections are welcome via https://github.com/ttscoff/bt-svg-viewer/issues.
 
 == Installation ==
 
-1. Upload the `wp-svg-viewer` folder to the `/wp-content/plugins/` directory, or install the ZIP archive via **Plugins → Add New → Upload Plugin**.
+1. Upload the `bt-svg-viewer` folder to the `/wp-content/plugins/` directory, or install the ZIP archive via **Plugins → Add New → Upload Plugin**.
 2. Activate the plugin through the **Plugins** menu in WordPress.
-3. Go to **SVG Viewer → Presets** to create your first reusable configuration, or place the basic shortcode `[svg_viewer src="/wp-content/uploads/diagram.svg"]` in a post or page.
+3. Go to **BT SVG Viewer → Presets** to create your first reusable configuration, or place the basic shortcode `[svg_viewer src="/wp-content/uploads/diagram.svg"]` in a post or page.
 
 == Frequently Asked Questions ==
 
@@ -50,7 +50,7 @@ Make sure the SVG URL is reachable by the browser. Open the path in a new tab to
 Yes. Attributes you place in the shortcode always override the stored preset settings. For example, `[svg_viewer id="42" controls_buttons="icon,zoom_in,zoom_out"]` keeps the preset’s other values but changes the control layout.
 
 = How do I customize button colors? =
-Use the preset color pickers or shortcode aliases such as `button_fill`, `button_border`, and `button_foreground`. Legacy aliases `button_bg` and `button_fg` still work and map to the new properties. You can also target the wrapper’s CSS custom properties (e.g. `--svg-viewer-button-fill`) in your theme.
+Use the preset color pickers or shortcode aliases such as `button_fill`, `button_border`, and `button_foreground`. Legacy aliases `button_bg` and `button_fg` still work and map to the new properties. You can also target the wrapper’s CSS custom properties (e.g. `--bt-svg-viewer-button-fill`) in your theme.
 
 = Can I add multiple SVG viewers on one page? =
 Absolutely. Each `[svg_viewer]` instance manages its own state, so you can embed as many as you like on the same post or template.

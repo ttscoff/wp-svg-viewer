@@ -4,11 +4,11 @@ includes:
 parameters:
 	tmpDir: build/phpstan
 	paths:
-		- wp-svg-viewer/svg-viewer-plugin.php
-		- wp-svg-viewer/admin
+		- bt-svg-viewer/bt-svg-viewer-plugin.php
+		- bt-svg-viewer/admin
 	level: 5
 	bootstrapFiles:
-		- wp-svg-viewer/tests/bootstrap.php
+		- bt-svg-viewer/tests/bootstrap.php
 	stubFiles:
 		- vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
 	ignoreErrors:

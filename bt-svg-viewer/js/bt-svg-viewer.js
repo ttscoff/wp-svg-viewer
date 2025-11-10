@@ -1,5 +1,5 @@
 /**
- * SVG Viewer Plugin
+ * BT SVG Viewer Plugin
  * Provides zoom, pan, and centering functionality for embedded SVGs
  */
 
@@ -252,7 +252,7 @@ class SVGViewer {
         this.centerView();
       }
     } catch (error) {
-      console.error("SVG Viewer Error:", error);
+      console.error("BT SVG Viewer Error:", error);
       this.viewport.innerHTML =
         '<div style="padding: 20px; color: red;">Error loading SVG. Check the file path and ensure CORS is configured if needed.</div>';
     }

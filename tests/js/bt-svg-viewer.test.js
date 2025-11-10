@@ -1,16 +1,16 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import SVGViewer from "../../wp-svg-viewer/js/svg-viewer.js";
+import SVGViewer from "../../bt-svg-viewer/js/bt-svg-viewer.js";
 
 describe("SVGViewer core behavior", () => {
 	beforeEach(() => {
 		document.body.innerHTML = `
-			<div id="viewer-1" class="svg-viewer-wrapper">
-				<div class="svg-viewer-main" data-viewer="viewer-1">
+			<div id="viewer-1" class="bt-svg-viewer-wrapper">
+				<div class="bt-svg-viewer-main" data-viewer="viewer-1">
 					<div class="svg-controls controls-mode-expanded" data-viewer="viewer-1">
-						<button class="svg-viewer-btn zoom-in-btn" data-viewer="viewer-1"></button>
-						<button class="svg-viewer-btn zoom-out-btn" data-viewer="viewer-1"></button>
-						<button class="svg-viewer-btn reset-zoom-btn" data-viewer="viewer-1"></button>
-						<button class="svg-viewer-btn center-view-btn" data-viewer="viewer-1"></button>
+						<button class="bt-svg-viewer-btn zoom-in-btn" data-viewer="viewer-1"></button>
+						<button class="bt-svg-viewer-btn zoom-out-btn" data-viewer="viewer-1"></button>
+						<button class="bt-svg-viewer-btn reset-zoom-btn" data-viewer="viewer-1"></button>
+						<button class="bt-svg-viewer-btn center-view-btn" data-viewer="viewer-1"></button>
 						<span class="zoom-percentage" data-viewer="viewer-1"></span>
 					</div>
 					<div class="svg-container" data-viewer="viewer-1">

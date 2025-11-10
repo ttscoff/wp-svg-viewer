@@ -209,10 +209,10 @@
   }
 
   function initTabs($root) {
-    $root.find(".svg-viewer-tabs").each(function () {
+    $root.find(".bt-svg-viewer-tabs").each(function () {
       const $container = $(this);
-      const $buttons = $container.find(".svg-viewer-tab-button");
-      const $panels = $container.find(".svg-viewer-tab-panel");
+      const $buttons = $container.find(".bt-svg-viewer-tab-button");
+      const $panels = $container.find(".bt-svg-viewer-tab-panel");
 
       function activateTab(target) {
         $buttons.each(function () {
@@ -475,10 +475,10 @@
       return;
     }
     const props = [
-      "--svg-viewer-button-fill",
-      "--svg-viewer-button-hover",
-      "--svg-viewer-button-border",
-      "--svg-viewer-button-text",
+      "--bt-svg-viewer-button-fill",
+      "--bt-svg-viewer-button-hover",
+      "--bt-svg-viewer-button-border",
+      "--bt-svg-viewer-button-text",
     ];
     const sanitizedFill = sanitizeHexColor(fill);
     const sanitizedBorder = sanitizeHexColor(border);
@@ -495,10 +495,10 @@
       });
 
       if (sanitizedFill) {
-        element.style.setProperty("--svg-viewer-button-fill", sanitizedFill);
+        element.style.setProperty("--bt-svg-viewer-button-fill", sanitizedFill);
         const hover = adjustHexBrightness(sanitizedFill, -12);
         if (hover) {
-          element.style.setProperty("--svg-viewer-button-hover", hover);
+          element.style.setProperty("--bt-svg-viewer-button-hover", hover);
         }
       }
 
@@ -509,14 +509,14 @@
 
       if (effectiveBorder) {
         element.style.setProperty(
-          "--svg-viewer-button-border",
+          "--bt-svg-viewer-button-border",
           effectiveBorder
         );
       }
 
       if (sanitizedForeground) {
         element.style.setProperty(
-          "--svg-viewer-button-text",
+          "--bt-svg-viewer-button-text",
           sanitizedForeground
         );
       }
@@ -541,7 +541,7 @@
   }
 
   function ensureMainWrapper($wrapper, viewerId) {
-    let $main = $wrapper.find(".svg-viewer-main");
+    let $main = $wrapper.find(".bt-svg-viewer-main");
     if ($main.length) {
       return $main;
     }
@@ -554,9 +554,9 @@
     }
 
     $container.wrap(
-      '<div class="svg-viewer-main controls-position-top controls-mode-both"></div>'
+      '<div class="bt-svg-viewer-main controls-position-top controls-mode-both"></div>'
     );
-    $main = $wrapper.find(".svg-viewer-main");
+    $main = $wrapper.find(".bt-svg-viewer-main");
     return $main;
   }
 
@@ -883,7 +883,7 @@
 
       const $btn = $("<button/>", {
         type: "button",
-        class: "svg-viewer-btn " + definition.class,
+        class: "bt-svg-viewer-btn " + definition.class,
         "data-viewer": viewerId,
         title: definition.title,
         "aria-label": definition.text,
@@ -1379,7 +1379,7 @@
   function bindMediaSelector($metaBox) {
     let mediaFrame = null;
 
-    $metaBox.on("click", ".svg-viewer-select-media", function (event) {
+    $metaBox.on("click", ".bt-svg-viewer-select-media", function (event) {
       event.preventDefault();
 
       if (mediaFrame) {
@@ -1416,7 +1416,7 @@
   }
 
   function initColorPickers($metaBox, viewerId) {
-    const $fields = $metaBox.find(".svg-viewer-color-field");
+    const $fields = $metaBox.find(".bt-svg-viewer-color-field");
 
     const resolveTargetWrapper = function () {
       if (typeof viewerId === "string" && viewerId.length) {
@@ -1490,7 +1490,7 @@
     $(document).on("click", ".svg-shortcode-full", function (event) {
       event.preventDefault();
       const $button = $(this);
-      const $metaBox = $button.closest(".svg-viewer-admin-meta");
+      const $metaBox = $button.closest(".bt-svg-viewer-admin-meta");
       const $status = $button.siblings(".svg-shortcode-status");
       const shortcode = buildFullShortcode($metaBox);
 
@@ -1515,7 +1515,7 @@
       copyShortcode(shortcode, $status, "fullCopySuccess");
     });
 
-    const $defaultsMeta = $(".svg-viewer-defaults-meta");
+    const $defaultsMeta = $(".bt-svg-viewer-defaults-meta");
     $defaultsMeta.each(function () {
       const $metaBox = $(this);
       const viewerId = $metaBox.data("viewerId") || "";
@@ -1523,7 +1523,7 @@
       initColorPickers($metaBox, viewerId);
     });
 
-    const $metaBoxes = $(".svg-viewer-admin-meta");
+    const $metaBoxes = $(".bt-svg-viewer-admin-meta");
     $metaBoxes.each(function () {
       const $metaBox = $(this);
       const viewerId = $metaBox.data("viewerId");

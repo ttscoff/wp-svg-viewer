@@ -1,5 +1,5 @@
 <!--README-->
-<!--GITHUB--># WP SVG Viewer
+<!--GITHUB--># BT SVG Viewer
 
 Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tools. Recent releases add a visual preset editor, icon-based controls, deeper shortcode options, and configurable button colors.
 
@@ -34,12 +34,12 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
 ## Installation
 
 1. **Unzip the plugin archive**
-   - Download [wp-svg-viewer.zip](github.com/ttscoff/wp-svg-viewer/releases/latest/download/wp-svg-viewer.zip).
-   - Unzip it locally; you will get a folder named `wp-svg-viewer`.
+   - Download [bt-svg-viewer.zip](github.com/ttscoff/bt-svg-viewer/releases/latest/download/bt-svg-viewer.zip).
+   - Unzip it locally; you will get a folder named `bt-svg-viewer`.
 2. **Upload the plugin**
-   - Copy the entire `wp-svg-viewer` folder into your WordPress installation at `/wp-content/plugins/`.
+   - Copy the entire `bt-svg-viewer` folder into your WordPress installation at `/wp-content/plugins/`.
 3. **Activate**
-   - In the WordPress admin, navigate to **Plugins** and click **Activate** on “SVG Viewer”.
+   - In the WordPress admin, navigate to **Plugins** and click **Activate** on “BT SVG Viewer”.
 
 ---
 
@@ -127,7 +127,7 @@ Example:
 
 ### Location
 
-`WordPress Dashboard → SVG Viewer → Presets`
+`WordPress Dashboard → BT SVG Viewer → Presets`
 
 ### Fields
 
@@ -156,7 +156,7 @@ Example:
 
 ### Defaults Tab
 
-- Visit **SVG Viewer → Presets → Defaults** to seed the fields used when creating a new preset.
+- Visit **BT SVG Viewer → Presets → Defaults** to seed the fields used when creating a new preset.
 - The panel now includes **Enable asset cache busting for debugging**, which appends a time-based suffix to scripts and styles. It is automatically active on hosts that start with `dev.` or `wptest.` and can be toggled manually when you need to defeat browser caching.
 
 ---
@@ -236,48 +236,48 @@ Example:
 
 Wrapper classes added by the plugin:
 
-- `.svg-viewer-wrapper` – outer container
-- `.svg-viewer-main` – wraps controls and SVG container
+- `.bt-svg-viewer-wrapper` – outer container
+- `.bt-svg-viewer-main` – wraps controls and SVG container
 - `.svg-controls` – control bar
 - `.controls-position-{top|bottom|left|right}`
 - `.controls-mode-{icon|text|both|compact|labels-on-hover|minimal}`
 - `.controls-align-{alignleft|aligncenter|alignright}`
-- `.svg-viewer-btn`, `.btn-icon`, `.btn-text`
+- `.bt-svg-viewer-btn`, `.btn-icon`, `.btn-text`
 - `.svg-container`, `.svg-viewport`, `.coord-output`, `.zoom-display`
 - `.zoom-slider-wrapper`, `.zoom-slider`
 
 Button colors are powered by CSS custom properties on the wrapper. Shortcode attributes and preset color pickers set these values, but you can override them manually:
 
 ```css
-.svg-viewer-wrapper {
-  --svg-viewer-button-fill: #1d4ed8;
-  --svg-viewer-button-border: #1d4ed8;
-  --svg-viewer-button-hover: #1e40af;
-  --svg-viewer-button-text: #ffffff;
-  --svg-viewer-slider-width: 240px;       /* optional: tweak slider width */
+.bt-svg-viewer-wrapper {
+  --bt-svg-viewer-button-fill: #1d4ed8;
+  --bt-svg-viewer-button-border: #1d4ed8;
+  --bt-svg-viewer-button-hover: #1e40af;
+  --bt-svg-viewer-button-text: #ffffff;
+  --bt-svg-viewer-slider-width: 240px;       /* optional: tweak slider width */
 }
 ```
 
 Example overrides:
 
 ```css
-.svg-viewer-wrapper.custom-map {
+.bt-svg-viewer-wrapper.custom-map {
   border-radius: 12px;
   overflow: hidden;
 }
 
-.svg-viewer-wrapper.custom-map .svg-controls {
+.bt-svg-viewer-wrapper.custom-map .svg-controls {
   background: #111;
   color: #fff;
   gap: 6px;
 }
 
-.svg-viewer-wrapper.custom-map .svg-viewer-btn {
+.bt-svg-viewer-wrapper.custom-map .bt-svg-viewer-btn {
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.3);
 }
 
-.svg-viewer-wrapper.custom-map .svg-viewer-btn:hover {
+.bt-svg-viewer-wrapper.custom-map .bt-svg-viewer-btn:hover {
   background: rgba(255,255,255,0.25);
 }
 ```

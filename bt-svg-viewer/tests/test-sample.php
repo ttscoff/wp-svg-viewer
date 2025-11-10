@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the WP SVG Viewer plugin core behavior.
+ * Tests for the BT SVG Viewer plugin core behavior.
  *
  * @package Wp_Svg_Viewer
  */
@@ -93,9 +93,9 @@ class SVG_Viewer_Tests extends WP_UnitTestCase
 			)
 		);
 
-		$this->assertStringContainsString('--svg-viewer-button-fill: #336699', $output);
-		$this->assertStringContainsString('--svg-viewer-button-border: #336699', $output);
-		$this->assertStringContainsString('--svg-viewer-button-text: #ffffff', $output);
+		$this->assertStringContainsString('--bt-svg-viewer-button-fill: #336699', $output);
+		$this->assertStringContainsString('--bt-svg-viewer-button-border: #336699', $output);
+		$this->assertStringContainsString('--bt-svg-viewer-button-text: #ffffff', $output);
 	}
 
 	/**
@@ -152,8 +152,8 @@ class SVG_Viewer_Tests extends WP_UnitTestCase
 			)
 		);
 
-		$this->assertStringContainsString('svg-viewer-wrapper', $output);
-		$this->assertStringContainsString('svg-viewer-main', $output);
+		$this->assertStringContainsString('bt-svg-viewer-wrapper', $output);
+		$this->assertStringContainsString('bt-svg-viewer-main', $output);
 		$this->assertStringContainsString($uploads_url . '/preset-path.svg', $output);
 		$this->assertStringContainsString('controls-mode', $output);
 
@@ -165,20 +165,20 @@ class SVG_Viewer_Tests extends WP_UnitTestCase
 	 */
 	public function test_shortcode_enqueue_assets()
 	{
-		if (wp_script_is('svg-viewer-script')) {
-			wp_dequeue_script('svg-viewer-script');
+		if (wp_script_is('bt-svg-viewer-script')) {
+			wp_dequeue_script('bt-svg-viewer-script');
 		}
-		if (wp_style_is('svg-viewer-style')) {
-			wp_dequeue_style('svg-viewer-style');
+		if (wp_style_is('bt-svg-viewer-style')) {
+			wp_dequeue_style('bt-svg-viewer-style');
 		}
 
-		$this->assertFalse(wp_style_is('svg-viewer-style', 'enqueued'));
-		$this->assertFalse(wp_script_is('svg-viewer-script', 'enqueued'));
+		$this->assertFalse(wp_style_is('bt-svg-viewer-style', 'enqueued'));
+		$this->assertFalse(wp_script_is('bt-svg-viewer-script', 'enqueued'));
 
 		do_action('wp_enqueue_scripts');
 
-		$this->assertTrue(wp_style_is('svg-viewer-style', 'enqueued'));
-		$this->assertTrue(wp_script_is('svg-viewer-script', 'enqueued'));
+		$this->assertTrue(wp_style_is('bt-svg-viewer-style', 'enqueued'));
+		$this->assertTrue(wp_script_is('bt-svg-viewer-script', 'enqueued'));
 	}
 
 	/**

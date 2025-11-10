@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WP SVG Viewer 1.0.1\n"
+"Project-Id-Version: BT SVG Viewer 1.0.1\n"
 "POT-Creation-Date: 2025-11-08 00:00+0000\n"
 "PO-Revision-Date: 2025-11-08 00:00+0000\n"
 "Last-Translator: \n"
@@ -11,21 +11,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: GPT-5 Codex\n"
-"X-Domain: svg-viewer\n"
+"X-Domain: bt-svg-viewer\n"
 
-#: wp-svg-viewer/admin/js/admin.js:35
+#: bt-svg-viewer/admin/js/admin.js:35
 msgid "Full shortcode copied to clipboard."
 msgstr "Shortcode completo copiado al portapapeles."
 
-#: wp-svg-viewer/admin/js/admin.js:1297
+#: bt-svg-viewer/admin/js/admin.js:1297
 msgid "Copy full shortcode"
 msgstr "Copiar shortcode completo"
 
-#: wp-svg-viewer/svg-viewer-plugin.php:647
+#: bt-svg-viewer/bt-svg-viewer-plugin.php:647
 msgid "Enable asset cache busting for debugging"
 msgstr "Activar la ruptura de caché de recursos para depuración"
 
-#: wp-svg-viewer/svg-viewer-plugin.php:651
+#: bt-svg-viewer/bt-svg-viewer-plugin.php:651
 msgid ""
 "Adds a unique suffix to script and style versions so browsers always fetch "
 "the latest assets. Useful for local testing; disable for production."
@@ -34,19 +34,19 @@ msgstr ""
 "navegadores siempre obtengan los recursos más recientes. Útil para pruebas "
 "locales; desactívalo en producción."
 
-#: wp-svg-viewer/js/svg-viewer.js:404
+#: bt-svg-viewer/js/bt-svg-viewer.js:404
 msgid "Cmd/Ctrl-click to zoom in, Option/Alt-click to zoom out."
 msgstr "Cmd/Ctrl-clic para acercar, Opción/Alt-clic para alejar."
 
-#: wp-svg-viewer/js/svg-viewer.js:406
+#: bt-svg-viewer/js/bt-svg-viewer.js:406
 msgid "Scroll up to zoom in, scroll down to zoom out."
 msgstr "Desplaza hacia arriba para acercar, hacia abajo para alejar."
 
-#: wp-svg-viewer/js/svg-viewer.js:409
+#: bt-svg-viewer/js/bt-svg-viewer.js:409
 msgid "Drag to pan around the image while scrolling zooms."
 msgstr "Arrastra para desplazarte por la imagen mientras el desplazamiento hace zoom."
 
-#: wp-svg-viewer/js/svg-viewer.js:411
+#: bt-svg-viewer/js/bt-svg-viewer.js:411
 msgid "Drag to pan around the image."
 msgstr "Arrastra para desplazarte por la imagen."
 
@@ -59,32 +59,32 @@ msgstr "Error: no se especificó la fuente SVG. Usa [svg_viewer src=\"path/to/fi
 msgid "Error: Invalid SVG path."
 msgstr "Error: ruta SVG no válida."
 
-msgid "SVG Viewer Presets"
-msgstr "Ajustes preestablecidos de SVG Viewer"
+msgid "BT SVG Viewer Presets"
+msgstr "Ajustes preestablecidos de BT SVG Viewer"
 
-msgid "SVG Viewer Preset"
-msgstr "Ajuste preestablecido de SVG Viewer"
+msgid "BT SVG Viewer Preset"
+msgstr "Ajuste preestablecido de BT SVG Viewer"
 
-msgid "SVG Viewer"
-msgstr "SVG Viewer"
+msgid "BT SVG Viewer"
+msgstr "BT SVG Viewer"
 
 msgid "Add New Preset"
 msgstr "Añadir nuevo ajuste"
 
-msgid "Add New SVG Viewer Preset"
-msgstr "Añadir nuevo ajuste preestablecido de SVG Viewer"
+msgid "Add New BT SVG Viewer Preset"
+msgstr "Añadir nuevo ajuste preestablecido de BT SVG Viewer"
 
-msgid "Edit SVG Viewer Preset"
-msgstr "Editar ajuste preestablecido de SVG Viewer"
+msgid "Edit BT SVG Viewer Preset"
+msgstr "Editar ajuste preestablecido de BT SVG Viewer"
 
-msgid "New SVG Viewer Preset"
-msgstr "Nuevo ajuste preestablecido de SVG Viewer"
+msgid "New BT SVG Viewer Preset"
+msgstr "Nuevo ajuste preestablecido de BT SVG Viewer"
 
-msgid "View SVG Viewer Preset"
-msgstr "Ver ajuste preestablecido de SVG Viewer"
+msgid "View BT SVG Viewer Preset"
+msgstr "Ver ajuste preestablecido de BT SVG Viewer"
 
-msgid "Search SVG Viewer Presets"
-msgstr "Buscar ajustes preestablecidos de SVG Viewer"
+msgid "Search BT SVG Viewer Presets"
+msgstr "Buscar ajustes preestablecidos de BT SVG Viewer"
 
 msgid "No presets found"
 msgstr "No se encontraron ajustes"
@@ -107,8 +107,8 @@ msgstr "Shortcode copiado al portapapeles."
 msgid "Press ⌘/Ctrl+C to copy the shortcode."
 msgstr "Pulsa ⌘/Ctrl+C para copiar el shortcode."
 
-msgid "SVG Viewer Settings"
-msgstr "Ajustes de SVG Viewer"
+msgid "BT SVG Viewer Settings"
+msgstr "Ajustes de BT SVG Viewer"
 
 msgid "Settings"
 msgstr "Ajustes"

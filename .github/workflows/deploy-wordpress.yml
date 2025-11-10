@@ -23,6 +23,6 @@ jobs:
               env:
                   SVN_USERNAME: ${{ secrets.WPORG_SVN_USERNAME }}
                   SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
-                  SLUG: svg-viewer
-                  BUILD_DIR: svg-viewer
+                  SLUG: bt-svg-viewer
+                  BUILD_DIR: bt-svg-viewer
                   VERSION: ${{ github.event.release.tag_name }}

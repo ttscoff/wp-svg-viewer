@@ -11,7 +11,7 @@
         "php-stubs/wordpress-stubs": "^6.5"
     },
     "scripts": {
-        "test:php": "vendor/bin/phpunit -c wp-svg-viewer/phpunit.xml.dist",
+        "test:php": "vendor/bin/phpunit -c bt-svg-viewer/phpunit.xml.dist",
         "lint:phpcs": "vendor/bin/phpcs",
         "lint:phpstan": "vendor/bin/phpstan analyse --configuration=phpstan.neon.dist",
         "lint": [

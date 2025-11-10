@@ -2,8 +2,8 @@
 <ruleset name="WP SVG Viewer">
 	<description>WordPress Coding Standards for WP SVG Viewer plugin.</description>
 
-	<file>wp-svg-viewer/svg-viewer-plugin.php</file>
-	<file>wp-svg-viewer/admin</file>
+	<file>bt-svg-viewer/bt-svg-viewer-plugin.php</file>
+	<file>bt-svg-viewer/admin</file>
 
 	<arg name="basepath" value="."/>
 	<arg value="sp"/>
