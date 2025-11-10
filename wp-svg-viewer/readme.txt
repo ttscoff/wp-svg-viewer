@@ -1,15 +1,15 @@
 === SVG Viewer ===
-A shortcode-powered SVG viewer with reusable presets, zoom, and pan controls.
-
-Contributors: ttscoff
+Contributors: bterp
 Donate link: https://brettterpstra.com/donate/
 Tags: svg, shortcode, maps, zoom, viewer
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.12
+Stable tag: 1.0.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+A shortcode-powered SVG viewer with reusable presets, zoom, and pan controls.
 
 == Description ==
 
@@ -66,7 +66,7 @@ All bundled icon markup runs through `wp_kses` to keep the controls safe. Upload
 
 == Changelog ==
 
-= 1.1.0 =
+= 1.0.12 =
 * Add shortcode/preset pan and zoom modes with automatic gesture captions for visitors.
 * Animate zoom transitions while keeping the pointer focus locked under the cursor.
 * Add an “Enable asset cache busting for debugging” toggle (auto-enabled on `dev.*`/`wptest.*` hosts).
@@ -103,9 +103,3 @@ All bundled icon markup runs through `wp_kses` to keep the controls safe. Upload
 
 = 1.0.0 =
 * Initial release with `[svg_viewer]` shortcode, zoom controls, and pan gestures.
-
-== Upgrade Notice ==
-
-= 1.1.0 =
-Update to 1.1.0 for animated cursor-focused zoom, drag-pan refinements, and new pan/zoom interaction options with built-in user guidance.
-
