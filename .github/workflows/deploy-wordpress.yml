@@ -23,6 +23,6 @@ jobs:
               env:
                   SVN_USERNAME: ${{ secrets.WPORG_SVN_USERNAME }}
                   SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
-                  SLUG: wp-svg-viewer
-                  BUILD_DIR: wp-svg-viewer
+                  SLUG: svg-viewer
+                  BUILD_DIR: svg-viewer
                   VERSION: ${{ github.event.release.tag_name }}

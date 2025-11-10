@@ -5,7 +5,7 @@ Tags: svg, shortcode, maps, zoom, viewer
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.13
+Stable tag: 1.0.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,7 +61,7 @@ All bundled icon markup runs through `wp_kses` to keep the controls safe. Upload
 == Screenshots ==
 
 1. Preset editor with live preview, button color pickers, and copy-ready shortcode helper.
-2. Front-end SVG viewer displaying zoom controls and caption beneath a floorplan diagram.
+2. Front-end SVG viewer displaying zoom controls and caption beneath a mind map.
 3. Icon-only controls stacked along the right edge using the compact preset layout.
 
 == Changelog ==
