@@ -1,3 +1,15 @@
+### 1.0.14
+
+2025-11-10 07:42
+
+#### CHANGED
+
+- Rename plugin and all text domains to BT SVG Viewer
+
+#### IMPROVED
+
+- Add screenshots for Plugin repository display
+
 ### 1.0.13
 
 2025-11-10 05:24
