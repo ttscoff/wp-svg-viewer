@@ -1,3 +1,11 @@
+### 1.0.13
+
+2025-11-10 05:24
+
+#### FIXED
+
+- Fix readme.txt for plugin submission
+
 ### 1.0.12
 
 2025-11-10 04:59
