@@ -5,13 +5,13 @@
  * @package Wp_Svg_Viewer
  */
 
-class BTSVVI_Viewer_Tests extends WP_UnitTestCase
+class BT_SVG_Viewer_Tests extends WP_UnitTestCase
 {
 
     /**
      * Plugin instance used across tests.
      *
-     * @var BTSVVI_Viewer
+     * @var BT_SVG_Viewer
      */
     protected static $plugin;
 
@@ -22,7 +22,7 @@ class BTSVVI_Viewer_Tests extends WP_UnitTestCase
      */
     public static function wpSetUpBeforeClass($factory)
     {
-        self::$plugin = BTSVVI_Viewer::get_instance();
+        self::$plugin = BT_SVG_Viewer::get_instance();
         self::$plugin->register_preset_post_type();
 
         if (!function_exists('sanitize_hex_color')) {
@@ -107,7 +107,7 @@ class BTSVVI_Viewer_Tests extends WP_UnitTestCase
      */
     public function test_get_button_color_style_declarations_sanitizes_values()
     {
-        $method = new ReflectionMethod(BTSVVI_Viewer::class, 'get_button_color_style_declarations');
+        $method = new ReflectionMethod(BT_SVG_Viewer::class, 'get_button_color_style_declarations');
         $method->setAccessible(true);
 
         $declarations = $method->invoke(self::$plugin, '#AaCcDd', '', ' #F0F0F0 ');
@@ -122,7 +122,7 @@ class BTSVVI_Viewer_Tests extends WP_UnitTestCase
      */
     public function test_adjust_color_brightness_handles_extremes()
     {
-        $method = new ReflectionMethod(BTSVVI_Viewer::class, 'adjust_color_brightness');
+        $method = new ReflectionMethod(BT_SVG_Viewer::class, 'adjust_color_brightness');
         $method->setAccessible(true);
 
         $this->assertSame('#ffffff', $method->invoke(self::$plugin, '#ffffff', 15.0));
@@ -135,7 +135,7 @@ class BTSVVI_Viewer_Tests extends WP_UnitTestCase
      */
     public function test_build_style_attribute_trims_duplicates()
     {
-        $method = new ReflectionMethod(BTSVVI_Viewer::class, 'build_style_attribute');
+        $method = new ReflectionMethod(BT_SVG_Viewer::class, 'build_style_attribute');
         $method->setAccessible(true);
 
         $result = $method->invoke(
@@ -203,7 +203,7 @@ class BTSVVI_Viewer_Tests extends WP_UnitTestCase
      */
     public function test_resolve_interaction_config_adjusts_pan_mode_and_messages()
     {
-        $method = new ReflectionMethod(BTSVVI_Viewer::class, 'resolve_interaction_config');
+        $method = new ReflectionMethod(BT_SVG_Viewer::class, 'resolve_interaction_config');
         $method->setAccessible(true);
 
         $result = $method->invoke(self::$plugin, 'scroll', 'scroll');

@@ -3,7 +3,7 @@
  * Plugin Name: BT SVG Viewer
  * Plugin URI: https://github.com/ttscoff/bt-svg-viewer/
  * Description: Embed interactive SVG files with zoom and pan controls
- * Version: 1.0.17
+ * Version: 1.0.18
  * Author: Brett Terpstra
  * Author URI: https://brettterpstra.com
  * License: GPLv2 or later
@@ -16,10 +16,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class BTSVVI_Viewer
+class BT_SVG_Viewer
 {
     private static $instance = null;
-    private $plugin_version = '1.0.17';
+    private $plugin_version = '1.0.18';
     private $preset_meta_fields = array(
         'svg_viewer_src' => '_svg_src',
         'svg_viewer_height' => '_svg_height',
@@ -367,7 +367,7 @@ class BTSVVI_Viewer
          * Filters whether BT SVG Viewer assets should be cache busted.
          *
          * @param bool       $should_bust Whether to append a time-based suffix.
-         * @param BTSVVI_Viewer $viewer      The plugin instance.
+         * @param BT_SVG_Viewer $viewer      The plugin instance.
          */
         return (bool) apply_filters('svg_viewer_should_cache_bust_assets', $should_bust, $this);
     }
@@ -395,7 +395,7 @@ class BTSVVI_Viewer
          *
          * @param string     $version The computed version string.
          * @param string     $context The asset context.
-         * @param BTSVVI_Viewer $viewer  The plugin instance.
+         * @param BT_SVG_Viewer $viewer  The plugin instance.
          */
         return (string) apply_filters('svg_viewer_asset_version', $this->asset_version, $context, $this);
     }
@@ -2727,4 +2727,4 @@ class BTSVVI_Viewer
 }
 
 // Initialize plugin
-BTSVVI_Viewer::get_instance();
+BT_SVG_Viewer::get_instance();
