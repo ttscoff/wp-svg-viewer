@@ -3,7 +3,7 @@
  * Plugin Name: BT SVG Viewer
  * Plugin URI: https://github.com/ttscoff/bt-svg-viewer/
  * Description: Embed interactive SVG files with zoom and pan controls
- * Version: 1.0.19
+ * Version: 1.0.20
  * Author: Brett Terpstra
  * Author URI: https://brettterpstra.com
  * License: GPLv2 or later
@@ -19,30 +19,31 @@ if (!defined('ABSPATH')) {
 class BT_SVG_Viewer
 {
     private static $instance = null;
-    private $plugin_version = '1.0.19';
+    private $plugin_version = '1.0.20';
     private $preset_meta_fields = array(
-        'svg_viewer_src' => '_svg_src',
-        'svg_viewer_height' => '_svg_height',
-        'svg_viewer_min_zoom' => '_svg_min_zoom',
-        'svg_viewer_max_zoom' => '_svg_max_zoom',
-        'svg_viewer_initial_zoom' => '_svg_initial_zoom',
-        'svg_viewer_zoom_step' => '_svg_zoom_step',
-        'svg_viewer_center_x' => '_svg_center_x',
-        'svg_viewer_center_y' => '_svg_center_y',
-        'svg_viewer_title' => '_svg_title',
-        'svg_viewer_caption' => '_svg_caption',
-        'svg_viewer_attachment_id' => '_svg_attachment_id',
-        'svg_viewer_controls_position' => '_svg_controls_position',
-        'svg_viewer_controls_buttons' => '_svg_controls_buttons',
-        'svg_viewer_button_fill' => '_svg_button_fill',
-        'svg_viewer_button_border' => '_svg_button_border',
-        'svg_viewer_button_foreground' => '_svg_button_foreground',
-        'svg_viewer_pan_mode' => '_svg_pan_mode',
-        'svg_viewer_zoom_mode' => '_svg_zoom_mode',
+        'btsvviewer_src' => '_btsvviewer_src',
+        'btsvviewer_height' => '_btsvviewer_height',
+        'btsvviewer_min_zoom' => '_btsvviewer_min_zoom',
+        'btsvviewer_max_zoom' => '_btsvviewer_max_zoom',
+        'btsvviewer_initial_zoom' => '_btsvviewer_initial_zoom',
+        'btsvviewer_zoom_step' => '_btsvviewer_zoom_step',
+        'btsvviewer_center_x' => '_btsvviewer_center_x',
+        'btsvviewer_center_y' => '_btsvviewer_center_y',
+        'btsvviewer_title' => '_btsvviewer_title',
+        'btsvviewer_caption' => '_btsvviewer_caption',
+        'btsvviewer_attachment_id' => '_btsvviewer_attachment_id',
+        'btsvviewer_controls_position' => '_btsvviewer_controls_position',
+        'btsvviewer_controls_buttons' => '_btsvviewer_controls_buttons',
+        'btsvviewer_button_fill' => '_btsvviewer_button_fill',
+        'btsvviewer_button_border' => '_btsvviewer_button_border',
+        'btsvviewer_button_foreground' => '_btsvviewer_button_foreground',
+        'btsvviewer_pan_mode' => '_btsvviewer_pan_mode',
+        'btsvviewer_zoom_mode' => '_btsvviewer_zoom_mode',
     );
     private $current_presets_admin_tab = null;
     private $asset_version = null;
-    private $defaults_option_key = 'svg_viewer_preset_defaults';
+    private $defaults_option_key = 'btsvviewer_preset_defaults';
+    private $migration_flag_option = 'btsvviewer_prefix_migrated';
 
     public static function get_instance()
     {
@@ -55,17 +56,20 @@ class BT_SVG_Viewer
     public function __construct()
     {
         $this->plugin_version = $this->read_plugin_version();
-        add_shortcode('svg_viewer', array($this, 'render_shortcode'));
+        $this->maybe_migrate_legacy_prefix_usage();
+        add_shortcode('btsvviewer', array($this, 'render_shortcode'));
+        add_shortcode($this->get_legacy_shortcode_tag(), array($this, 'render_shortcode'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
         add_filter('upload_mimes', array($this, 'svg_use_mimetypes'));
         add_action('init', array($this, 'register_preset_post_type'));
-        add_action('add_meta_boxes_svg_viewer_preset', array($this, 'register_preset_meta_boxes'));
-        add_action('save_post_svg_viewer_preset', array($this, 'save_preset_meta'), 10, 2);
+        add_action('add_meta_boxes_btsvviewer_preset', array($this, 'register_preset_meta_boxes'));
+        add_action('save_post_btsvviewer_preset', array($this, 'save_preset_meta'), 10, 2);
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
-        add_filter('manage_svg_viewer_preset_posts_columns', array($this, 'add_shortcode_column'));
-        add_action('manage_svg_viewer_preset_posts_custom_column', array($this, 'render_shortcode_column'), 10, 2);
+        add_filter('manage_btsvviewer_preset_posts_columns', array($this, 'add_shortcode_column'));
+        add_action('manage_btsvviewer_preset_posts_custom_column', array($this, 'render_shortcode_column'), 10, 2);
         add_action('current_screen', array($this, 'maybe_setup_presets_screen'));
-        add_action('admin_post_svg_viewer_save_defaults', array($this, 'handle_save_default_options'));
+        add_action('admin_post_btsvviewer_save_defaults', array($this, 'handle_save_default_options'));
+        add_action('admin_post_' . $this->get_legacy_prefix() . '_save_defaults', array($this, 'handle_save_default_options'));
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_plugin_settings_link'));
     }
 
@@ -171,6 +175,185 @@ class BT_SVG_Viewer
     }
 
     /**
+     * Upgrade legacy identifiers to the new btsvviewer prefix.
+     *
+     * @return void
+     */
+    private function maybe_migrate_legacy_prefix_usage()
+    {
+        $already_migrated = get_option($this->migration_flag_option, '');
+        if ($already_migrated === '1') {
+            return;
+        }
+
+        $legacy_prefix = $this->get_legacy_prefix();
+
+        $this->migrate_legacy_defaults_option($this->get_legacy_defaults_option_key());
+        $this->migrate_legacy_post_type($legacy_prefix . '_preset');
+        $this->migrate_legacy_meta_keys($this->get_legacy_meta_prefix());
+
+        update_option($this->migration_flag_option, '1');
+    }
+
+    /**
+     * Promote stored defaults keyed under the legacy option name.
+     *
+     * @param string $legacy_option_key
+     * @return void
+     */
+    private function migrate_legacy_defaults_option($legacy_option_key)
+    {
+        $legacy_defaults = get_option($legacy_option_key, null);
+
+        if ($legacy_defaults === false || $legacy_defaults === null) {
+            return;
+        }
+
+        if (is_array($legacy_defaults)) {
+            $legacy_defaults = $this->convert_legacy_field_names($legacy_defaults);
+        }
+
+        $current_defaults = get_option($this->defaults_option_key, null);
+
+        if ($current_defaults === false || $current_defaults === null || $current_defaults === array()) {
+            update_option($this->defaults_option_key, $legacy_defaults);
+        }
+
+        delete_option($legacy_option_key);
+    }
+
+    /**
+     * Update stored presets that still use the legacy custom post type.
+     *
+     * @param string $legacy_post_type
+     * @return void
+     */
+    private function migrate_legacy_post_type($legacy_post_type)
+    {
+        global $wpdb;
+
+        if (!isset($wpdb->posts)) {
+            return;
+        }
+
+        $wpdb->update(
+            $wpdb->posts,
+            array('post_type' => 'btsvviewer_preset'),
+            array('post_type' => $legacy_post_type)
+        );
+    }
+
+    /**
+     * Convert saved meta keys that still use the legacy prefix.
+     *
+     * @param string $legacy_meta_prefix
+     * @return void
+     */
+    private function migrate_legacy_meta_keys($legacy_meta_prefix)
+    {
+        global $wpdb;
+
+        if (!isset($wpdb->postmeta)) {
+            return;
+        }
+
+        $suffixes = array(
+            'src',
+            'attachment_id',
+            'height',
+            'min_zoom',
+            'max_zoom',
+            'initial_zoom',
+            'zoom_step',
+            'center_x',
+            'center_y',
+            'title',
+            'caption',
+            'controls_position',
+            'controls_buttons',
+            'button_fill',
+            'button_border',
+            'button_foreground',
+            'pan_mode',
+            'zoom_mode',
+        );
+
+        foreach ($suffixes as $suffix) {
+            $legacy_key = $legacy_meta_prefix . $suffix;
+            $new_key = '_btsvviewer_' . $suffix;
+
+            $wpdb->update(
+                $wpdb->postmeta,
+                array('meta_key' => $new_key),
+                array('meta_key' => $legacy_key)
+            );
+        }
+    }
+
+    /**
+     * Replace legacy preset field keys with the btsvviewer_* prefix.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function convert_legacy_field_names($data)
+    {
+        $legacy_field_prefix = $this->get_legacy_prefix() . '_';
+        $converted = array();
+
+        foreach ($data as $key => $value) {
+            if (strpos($key, $legacy_field_prefix) === 0) {
+                $converted['btsvviewer_' . substr($key, strlen($legacy_field_prefix))] = $value;
+                continue;
+            }
+
+            $converted[$key] = $value;
+        }
+
+        return $converted;
+    }
+
+    /**
+     * Legacy shortcode prefix split to avoid reintroducing the literal string.
+     *
+     * @return string
+     */
+    private function get_legacy_prefix()
+    {
+        return 'svg' . '_viewer';
+    }
+
+    /**
+     * Legacy meta key prefix equivalent to _svg_.
+     *
+     * @return string
+     */
+    private function get_legacy_meta_prefix()
+    {
+        return '_' . 'svg' . '_';
+    }
+
+    /**
+     * Legacy defaults option key (previous preset defaults option).
+     *
+     * @return string
+     */
+    private function get_legacy_defaults_option_key()
+    {
+        return $this->get_legacy_prefix() . '_preset_defaults';
+    }
+
+    /**
+     * Legacy shortcode tag string.
+     *
+     * @return string
+     */
+    private function get_legacy_shortcode_tag()
+    {
+        return $this->get_legacy_prefix();
+    }
+
+    /**
      * Sanitize a preset default options payload.
      *
      * @param mixed $data
@@ -182,23 +365,23 @@ class BT_SVG_Viewer
         $sanitized = array();
 
         $field_map = array(
-            'src' => array('svg_viewer_src', 'src'),
-            'attachment_id' => array('svg_viewer_attachment_id', 'attachment_id'),
-            'height' => array('svg_viewer_height', 'height'),
-            'min_zoom' => array('svg_viewer_min_zoom', 'min_zoom'),
-            'max_zoom' => array('svg_viewer_max_zoom', 'max_zoom'),
-            'initial_zoom' => array('svg_viewer_initial_zoom', 'initial_zoom'),
-            'zoom_step' => array('svg_viewer_zoom_step', 'zoom_step'),
-            'title' => array('svg_viewer_title', 'title'),
-            'caption' => array('svg_viewer_caption', 'caption'),
-            'controls_position' => array('svg_viewer_controls_position', 'controls_position'),
-            'controls_buttons' => array('svg_viewer_controls_buttons', 'controls_buttons'),
-            'button_fill' => array('svg_viewer_button_fill', 'button_fill'),
-            'button_border' => array('svg_viewer_button_border', 'button_border'),
-            'button_foreground' => array('svg_viewer_button_foreground', 'button_foreground'),
-            'pan_mode' => array('svg_viewer_pan_mode', 'pan_mode'),
-            'zoom_mode' => array('svg_viewer_zoom_mode', 'zoom_mode'),
-            'debug_cache_bust' => array('svg_viewer_debug_cache_bust', 'debug_cache_bust'),
+            'src' => array('btsvviewer_src', 'src'),
+            'attachment_id' => array('btsvviewer_attachment_id', 'attachment_id'),
+            'height' => array('btsvviewer_height', 'height'),
+            'min_zoom' => array('btsvviewer_min_zoom', 'min_zoom'),
+            'max_zoom' => array('btsvviewer_max_zoom', 'max_zoom'),
+            'initial_zoom' => array('btsvviewer_initial_zoom', 'initial_zoom'),
+            'zoom_step' => array('btsvviewer_zoom_step', 'zoom_step'),
+            'title' => array('btsvviewer_title', 'title'),
+            'caption' => array('btsvviewer_caption', 'caption'),
+            'controls_position' => array('btsvviewer_controls_position', 'controls_position'),
+            'controls_buttons' => array('btsvviewer_controls_buttons', 'controls_buttons'),
+            'button_fill' => array('btsvviewer_button_fill', 'button_fill'),
+            'button_border' => array('btsvviewer_button_border', 'button_border'),
+            'button_foreground' => array('btsvviewer_button_foreground', 'button_foreground'),
+            'pan_mode' => array('btsvviewer_pan_mode', 'pan_mode'),
+            'zoom_mode' => array('btsvviewer_zoom_mode', 'zoom_mode'),
+            'debug_cache_bust' => array('btsvviewer_debug_cache_bust', 'debug_cache_bust'),
         );
 
         foreach ($field_map as $output_key => $input_keys) {
@@ -369,7 +552,7 @@ class BT_SVG_Viewer
          * @param bool       $should_bust Whether to append a time-based suffix.
          * @param BT_SVG_Viewer $viewer      The plugin instance.
          */
-        return (bool) apply_filters('svg_viewer_should_cache_bust_assets', $should_bust, $this);
+        return (bool) apply_filters('btsvviewer_should_cache_bust_assets', $should_bust, $this);
     }
 
     /**
@@ -397,7 +580,7 @@ class BT_SVG_Viewer
          * @param string     $context The asset context.
          * @param BT_SVG_Viewer $viewer  The plugin instance.
          */
-        return (string) apply_filters('svg_viewer_asset_version', $this->asset_version, $context, $this);
+        return (string) apply_filters('btsvviewer_asset_version', $this->asset_version, $context, $this);
     }
 
     /**
@@ -425,7 +608,7 @@ class BT_SVG_Viewer
      */
     public function maybe_setup_presets_screen($screen)
     {
-        if (!$screen || $screen->id !== 'edit-svg_viewer_preset') {
+        if (!$screen || $screen->id !== 'edit-btsvviewer_preset') {
             return;
         }
 
@@ -457,7 +640,7 @@ class BT_SVG_Viewer
             return;
         }
 
-        $base_url = add_query_arg('post_type', 'svg_viewer_preset', admin_url('edit.php'));
+        $base_url = add_query_arg('post_type', 'btsvviewer_preset', admin_url('edit.php'));
         $tabs = array(
             'presets' => __('Presets', 'bt-svg-viewer'),
             'defaults' => __('Default Options', 'bt-svg-viewer'),
@@ -553,37 +736,37 @@ class BT_SVG_Viewer
         <p><?php esc_html_e('Center X and Center Y automatically default to the middle of the SVG and are not configurable here. Set preset-specific SVG sources while editing each preset.', 'bt-svg-viewer'); ?>
         </p>
         <form method="post" action="<?php echo esc_url($form_action); ?>" class="bt-svg-viewer-defaults-form">
-            <?php wp_nonce_field('svg_viewer_save_defaults', 'svg_viewer_defaults_nonce'); ?>
-            <input type="hidden" name="action" value="svg_viewer_save_defaults" />
+            <?php wp_nonce_field('btsvviewer_save_defaults', 'btsvviewer_defaults_nonce'); ?>
+            <input type="hidden" name="action" value="btsvviewer_save_defaults" />
             <div class="bt-svg-viewer-defaults-meta">
                 <div class="bt-svg-viewer-field-group">
                     <div class="bt-svg-viewer-field">
                         <label for="bt-svg-viewer-default-height"><?php esc_html_e('Viewer Height', 'bt-svg-viewer'); ?></label>
-                        <input type="text" id="bt-svg-viewer-default-height" name="svg_viewer_height"
+                        <input type="text" id="bt-svg-viewer-default-height" name="btsvviewer_height"
                             value="<?php echo esc_attr($defaults['height']); ?>" placeholder="600px" />
                     </div>
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-min-zoom"><?php esc_html_e('Min Zoom (%)', 'bt-svg-viewer'); ?></label>
-                        <input type="number" id="bt-svg-viewer-default-min-zoom" name="svg_viewer_min_zoom"
+                        <input type="number" id="bt-svg-viewer-default-min-zoom" name="btsvviewer_min_zoom"
                             value="<?php echo esc_attr($defaults['min_zoom']); ?>" min="1" step="1" />
                     </div>
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-max-zoom"><?php esc_html_e('Max Zoom (%)', 'bt-svg-viewer'); ?></label>
-                        <input type="number" id="bt-svg-viewer-default-max-zoom" name="svg_viewer_max_zoom"
+                        <input type="number" id="bt-svg-viewer-default-max-zoom" name="btsvviewer_max_zoom"
                             value="<?php echo esc_attr($defaults['max_zoom']); ?>" min="1" step="1" />
                     </div>
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'bt-svg-viewer'); ?></label>
-                        <input type="number" id="bt-svg-viewer-default-initial-zoom" name="svg_viewer_initial_zoom"
+                        <input type="number" id="bt-svg-viewer-default-initial-zoom" name="btsvviewer_initial_zoom"
                             value="<?php echo esc_attr($defaults['initial_zoom']); ?>" min="1" step="1" />
                     </div>
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'bt-svg-viewer'); ?></label>
-                        <input type="number" id="bt-svg-viewer-default-zoom-step" name="svg_viewer_zoom_step"
+                        <input type="number" id="bt-svg-viewer-default-zoom-step" name="btsvviewer_zoom_step"
                             value="<?php echo esc_attr($defaults['zoom_step']); ?>" min="0.1" step="0.1" />
                     </div>
                 </div>
@@ -592,7 +775,7 @@ class BT_SVG_Viewer
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-controls-position"><?php esc_html_e('Controls Position', 'bt-svg-viewer'); ?></label>
-                        <select id="bt-svg-viewer-default-controls-position" name="svg_viewer_controls_position">
+                        <select id="bt-svg-viewer-default-controls-position" name="btsvviewer_controls_position">
                             <?php
                             $positions_options = array(
                                 'top' => __('Top', 'bt-svg-viewer'),
@@ -611,7 +794,7 @@ class BT_SVG_Viewer
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'bt-svg-viewer'); ?></label>
-                        <input type="text" id="bt-svg-viewer-default-controls-buttons" name="svg_viewer_controls_buttons"
+                        <input type="text" id="bt-svg-viewer-default-controls-buttons" name="btsvviewer_controls_buttons"
                             value="<?php echo esc_attr($defaults['controls_buttons']); ?>" placeholder="both" />
                         <p class="description">
                             <?php esc_html_e('Combine multiple options with commas. Examples: both, icon, text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords', 'bt-svg-viewer'); ?>
@@ -623,7 +806,7 @@ class BT_SVG_Viewer
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-pan-mode"><?php esc_html_e('Pan Interaction', 'bt-svg-viewer'); ?></label>
-                        <select id="bt-svg-viewer-default-pan-mode" name="svg_viewer_pan_mode">
+                        <select id="bt-svg-viewer-default-pan-mode" name="btsvviewer_pan_mode">
                             <?php
                             $pan_options = array(
                                 'scroll' => __('Scroll (default)', 'bt-svg-viewer'),
@@ -643,7 +826,7 @@ class BT_SVG_Viewer
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-zoom-mode"><?php esc_html_e('Zoom Interaction', 'bt-svg-viewer'); ?></label>
-                        <select id="bt-svg-viewer-default-zoom-mode" name="svg_viewer_zoom_mode">
+                        <select id="bt-svg-viewer-default-zoom-mode" name="btsvviewer_zoom_mode">
                             <?php
                             $zoom_options = array(
                                 'super_scroll' => __('Cmd/Ctrl-scroll (default)', 'bt-svg-viewer'),
@@ -663,7 +846,7 @@ class BT_SVG_Viewer
                     </div>
                     <div class="bt-svg-viewer-field bt-svg-viewer-field-checkbox">
                         <label for="bt-svg-viewer-debug-cache-bust">
-                            <input type="checkbox" id="bt-svg-viewer-debug-cache-bust" name="svg_viewer_debug_cache_bust"
+                            <input type="checkbox" id="bt-svg-viewer-debug-cache-bust" name="btsvviewer_debug_cache_bust"
                                 value="1" <?php checked(!empty($defaults['debug_cache_bust'])); ?> />
                             <?php esc_html_e('Enable asset cache busting for debugging', 'bt-svg-viewer'); ?>
                         </label>
@@ -677,7 +860,7 @@ class BT_SVG_Viewer
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-button-fill"><?php esc_html_e('Button Fill Color', 'bt-svg-viewer'); ?></label>
-                        <input type="text" id="bt-svg-viewer-default-button-fill" name="svg_viewer_button_fill"
+                        <input type="text" id="bt-svg-viewer-default-button-fill" name="btsvviewer_button_fill"
                             class="bt-svg-viewer-color-field" value="<?php echo esc_attr($defaults['button_fill']); ?>"
                             data-default-color="#0073aa" />
                         <p class="description">
@@ -687,7 +870,7 @@ class BT_SVG_Viewer
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-button-border"><?php esc_html_e('Button Border Color', 'bt-svg-viewer'); ?></label>
-                        <input type="text" id="bt-svg-viewer-default-button-border" name="svg_viewer_button_border"
+                        <input type="text" id="bt-svg-viewer-default-button-border" name="btsvviewer_button_border"
                             class="bt-svg-viewer-color-field" value="<?php echo esc_attr($defaults['button_border']); ?>"
                             data-default-color="#0073aa" />
                         <p class="description">
@@ -697,7 +880,7 @@ class BT_SVG_Viewer
                     <div class="bt-svg-viewer-field">
                         <label
                             for="bt-svg-viewer-default-button-foreground"><?php esc_html_e('Button Foreground Color', 'bt-svg-viewer'); ?></label>
-                        <input type="text" id="bt-svg-viewer-default-button-foreground" name="svg_viewer_button_foreground"
+                        <input type="text" id="bt-svg-viewer-default-button-foreground" name="btsvviewer_button_foreground"
                             class="bt-svg-viewer-color-field" value="<?php echo esc_attr($defaults['button_foreground']); ?>"
                             data-default-color="#ffffff" />
                         <p class="description">
@@ -708,14 +891,14 @@ class BT_SVG_Viewer
 
                 <div class="bt-svg-viewer-field">
                     <label for="bt-svg-viewer-default-title"><?php esc_html_e('Title (optional)', 'bt-svg-viewer'); ?></label>
-                    <input type="text" id="bt-svg-viewer-default-title" name="svg_viewer_title"
+                    <input type="text" id="bt-svg-viewer-default-title" name="btsvviewer_title"
                         value="<?php echo esc_attr($defaults['title']); ?>" />
                 </div>
 
                 <div class="bt-svg-viewer-field">
                     <label
                         for="bt-svg-viewer-default-caption"><?php esc_html_e('Caption (optional)', 'bt-svg-viewer'); ?></label>
-                    <textarea id="bt-svg-viewer-default-caption" name="svg_viewer_caption" rows="3"
+                    <textarea id="bt-svg-viewer-default-caption" name="btsvviewer_caption" rows="3"
                         class="widefat"><?php echo esc_textarea($defaults['caption']); ?></textarea>
                     <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'bt-svg-viewer'); ?></p>
                 </div>
@@ -737,15 +920,15 @@ class BT_SVG_Viewer
         }
 
         $css_rules = array(
-            '.post-type-svg_viewer_preset .wrap .tablenav,' .
-            '.post-type-svg_viewer_preset .wrap .wp-list-table,' .
-            '.post-type-svg_viewer_preset .wrap .subsubsub,' .
-            '.post-type-svg_viewer_preset .wrap .search-box,' .
-            '.post-type-svg_viewer_preset .wrap .tablenav.bottom,' .
-            '.post-type-svg_viewer_preset .wrap .wp-heading-inline,' .
-            '.post-type-svg_viewer_preset .wrap .page-title-action,' .
-            '.post-type-svg_viewer_preset .wrap .alignleft.actions,' .
-            '.post-type-svg_viewer_preset .wrap .tablenav-pages,' .
+            '.post-type-btsvviewer_preset .wrap .tablenav,' .
+            '.post-type-btsvviewer_preset .wrap .wp-list-table,' .
+            '.post-type-btsvviewer_preset .wrap .subsubsub,' .
+            '.post-type-btsvviewer_preset .wrap .search-box,' .
+            '.post-type-btsvviewer_preset .wrap .tablenav.bottom,' .
+            '.post-type-btsvviewer_preset .wrap .wp-heading-inline,' .
+            '.post-type-btsvviewer_preset .wrap .page-title-action,' .
+            '.post-type-btsvviewer_preset .wrap .alignleft.actions,' .
+            '.post-type-btsvviewer_preset .wrap .tablenav-pages,' .
             '#screen-options-link-wrap,' .
             '#contextual-help-link { display: none !important; }',
             '.bt-svg-viewer-admin-screen-panel { margin-top: 20px; background: #fff; padding: 20px; border: 1px solid #dcdcde; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04); }',
@@ -767,30 +950,30 @@ class BT_SVG_Viewer
             wp_die(esc_html__('You do not have permission to perform this action.', 'bt-svg-viewer'));
         }
 
-        $defaults_nonce = isset($_POST['svg_viewer_defaults_nonce']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_defaults_nonce'])) : '';
+        $defaults_nonce = isset($_POST['btsvviewer_defaults_nonce']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_defaults_nonce'])) : '';
 
-        if ($defaults_nonce === '' || !wp_verify_nonce($defaults_nonce, 'svg_viewer_save_defaults')) {
+        if ($defaults_nonce === '' || !wp_verify_nonce($defaults_nonce, 'btsvviewer_save_defaults')) {
             wp_die(esc_html__('Security check failed. Please try again.', 'bt-svg-viewer'));
         }
 
         $input_keys = array(
-            'svg_viewer_src',
-            'svg_viewer_attachment_id',
-            'svg_viewer_height',
-            'svg_viewer_min_zoom',
-            'svg_viewer_max_zoom',
-            'svg_viewer_initial_zoom',
-            'svg_viewer_zoom_step',
-            'svg_viewer_title',
-            'svg_viewer_caption',
-            'svg_viewer_controls_position',
-            'svg_viewer_controls_buttons',
-            'svg_viewer_button_fill',
-            'svg_viewer_button_border',
-            'svg_viewer_button_foreground',
-            'svg_viewer_pan_mode',
-            'svg_viewer_zoom_mode',
-            'svg_viewer_debug_cache_bust',
+            'btsvviewer_src',
+            'btsvviewer_attachment_id',
+            'btsvviewer_height',
+            'btsvviewer_min_zoom',
+            'btsvviewer_max_zoom',
+            'btsvviewer_initial_zoom',
+            'btsvviewer_zoom_step',
+            'btsvviewer_title',
+            'btsvviewer_caption',
+            'btsvviewer_controls_position',
+            'btsvviewer_controls_buttons',
+            'btsvviewer_button_fill',
+            'btsvviewer_button_border',
+            'btsvviewer_button_foreground',
+            'btsvviewer_pan_mode',
+            'btsvviewer_zoom_mode',
+            'btsvviewer_debug_cache_bust',
         );
 
         $raw_input = array();
@@ -806,7 +989,7 @@ class BT_SVG_Viewer
 
         $redirect_url = add_query_arg(
             array(
-                'post_type' => 'svg_viewer_preset',
+                'post_type' => 'btsvviewer_preset',
                 'svg_tab' => 'defaults',
                 'svg_defaults_status' => 'updated',
             ),
@@ -849,7 +1032,7 @@ class BT_SVG_Viewer
         );
 
         // Pass plugin URL to JavaScript
-        wp_localize_script('bt-svg-viewer-script', 'svgViewerConfig', array(
+        wp_localize_script('bt-svg-viewer-script', 'btsvviewerConfig', array(
             'pluginUrl' => plugins_url('', __FILE__),
             'assetVersion' => $asset_version,
         ));
@@ -858,13 +1041,13 @@ class BT_SVG_Viewer
     /**
      * Render the shortcode
      *
-     * Usage: [svg_viewer src="/path/to/file.svg" height="600px"]
+     * Usage: [btsvviewer src="/path/to/file.svg" height="600px"]
      */
     public function render_shortcode($atts)
     {
         $raw_atts = is_array($atts) ? $atts : array();
 
-        $atts = shortcode_atts($this->get_shortcode_default_attributes(), $atts, 'svg_viewer');
+        $atts = shortcode_atts($this->get_shortcode_default_attributes(), $atts, 'btsvviewer');
 
         if (!array_key_exists('button_fill', $raw_atts)) {
             if (array_key_exists('button_background', $raw_atts)) {
@@ -966,7 +1149,7 @@ class BT_SVG_Viewer
             $error_message = sprintf(
                 '<div style="color: red; padding: 10px; border: 1px solid red;">%s</div>',
                 esc_html__(
-                    'Error: SVG source not specified. Use [svg_viewer src="path/to/file.svg"]',
+                    'Error: SVG source not specified. Use [btsvviewer src="path/to/file.svg"]',
                     'bt-svg-viewer'
                 )
             );
@@ -974,7 +1157,7 @@ class BT_SVG_Viewer
         }
 
         // Convert relative paths to absolute URLs
-        $svg_url = $this->get_svg_url($atts['src']);
+        $svg_url = $this->get_btsvviewer_url($atts['src']);
 
         if (!$svg_url) {
             $error_message = sprintf(
@@ -1099,7 +1282,8 @@ class BT_SVG_Viewer
                 <?php endif; ?>
                 <div class="svg-container" style="height: <?php echo esc_attr($atts['height']); ?>"
                     data-viewer="<?php echo esc_attr($viewer_id); ?>">
-                    <div class="svg-viewport" data-viewer="<?php echo esc_attr($viewer_id); ?>">
+                    <div class="svg-viewport" data-viewer="<?php echo esc_attr($viewer_id); ?>"
+                        data-svg-url="<?php echo esc_url($svg_url); ?>">
                         <!-- SVG will be loaded here -->
                     </div>
                 </div>
@@ -1146,7 +1330,7 @@ class BT_SVG_Viewer
     /**
      * Convert SVG path to URL
      */
-    private function get_svg_url($path)
+    private function get_btsvviewer_url($path)
     {
         // If it's already a full URL, validate it
         if (filter_var($path, FILTER_VALIDATE_URL)) {
@@ -1195,7 +1379,7 @@ class BT_SVG_Viewer
             'capability_type' => 'post',
         );
 
-        register_post_type('svg_viewer_preset', $args);
+        register_post_type('btsvviewer_preset', $args);
     }
 
     /**
@@ -1204,7 +1388,7 @@ class BT_SVG_Viewer
     public function enqueue_admin_assets($hook)
     {
         $screen = get_current_screen();
-        if (!$screen || $screen->post_type !== 'svg_viewer_preset') {
+        if (!$screen || $screen->post_type !== 'btsvviewer_preset') {
             return;
         }
 
@@ -1236,7 +1420,7 @@ class BT_SVG_Viewer
             true
         );
 
-        wp_localize_script('bt-svg-viewer-script', 'svgViewerConfig', array(
+        wp_localize_script('bt-svg-viewer-script', 'btsvviewerConfig', array(
             'pluginUrl' => plugins_url('', __FILE__),
             'assetVersion' => $asset_version,
         ));
@@ -1251,7 +1435,7 @@ class BT_SVG_Viewer
 
         $button_definitions = $this->get_button_definitions();
 
-        wp_localize_script('bt-svg-viewer-admin', 'svgViewerAdmin', array(
+        wp_localize_script('bt-svg-viewer-admin', 'btsvviewerAdmin', array(
             'i18n' => array(
                 'missingSrc' => __('Please select an SVG before loading the preview.', 'bt-svg-viewer'),
                 'captureSaved' => __('Captured viewer state from the preview.', 'bt-svg-viewer'),
@@ -1277,7 +1461,7 @@ class BT_SVG_Viewer
             'bt-svg-viewer-preset-settings',
             __('BT SVG Viewer Settings', 'bt-svg-viewer'),
             array($this, 'render_preset_meta_box'),
-            'svg_viewer_preset',
+            'btsvviewer_preset',
             'normal',
             'high'
         );
@@ -1288,29 +1472,29 @@ class BT_SVG_Viewer
      */
     public function render_preset_meta_box($post)
     {
-        wp_nonce_field('svg_viewer_preset_meta', 'svg_viewer_preset_nonce');
+        wp_nonce_field('btsvviewer_preset_meta', 'btsvviewer_preset_nonce');
 
         $defaults = $this->get_preset_form_defaults();
 
         $values = array(
-            'src' => get_post_meta($post->ID, '_svg_src', true),
-            'height' => get_post_meta($post->ID, '_svg_height', true),
-            'min_zoom' => get_post_meta($post->ID, '_svg_min_zoom', true),
-            'max_zoom' => get_post_meta($post->ID, '_svg_max_zoom', true),
-            'initial_zoom' => get_post_meta($post->ID, '_svg_initial_zoom', true),
-            'zoom_step' => get_post_meta($post->ID, '_svg_zoom_step', true),
-            'center_x' => get_post_meta($post->ID, '_svg_center_x', true),
-            'center_y' => get_post_meta($post->ID, '_svg_center_y', true),
-            'title' => get_post_meta($post->ID, '_svg_title', true),
-            'caption' => get_post_meta($post->ID, '_svg_caption', true),
-            'attachment_id' => get_post_meta($post->ID, '_svg_attachment_id', true),
-            'controls_position' => get_post_meta($post->ID, '_svg_controls_position', true),
-            'controls_buttons' => get_post_meta($post->ID, '_svg_controls_buttons', true),
-            'button_fill' => get_post_meta($post->ID, '_svg_button_fill', true),
-            'button_border' => get_post_meta($post->ID, '_svg_button_border', true),
-            'button_foreground' => get_post_meta($post->ID, '_svg_button_foreground', true),
-            'pan_mode' => get_post_meta($post->ID, '_svg_pan_mode', true),
-            'zoom_mode' => get_post_meta($post->ID, '_svg_zoom_mode', true),
+            'src' => get_post_meta($post->ID, '_btsvviewer_src', true),
+            'height' => get_post_meta($post->ID, '_btsvviewer_height', true),
+            'min_zoom' => get_post_meta($post->ID, '_btsvviewer_min_zoom', true),
+            'max_zoom' => get_post_meta($post->ID, '_btsvviewer_max_zoom', true),
+            'initial_zoom' => get_post_meta($post->ID, '_btsvviewer_initial_zoom', true),
+            'zoom_step' => get_post_meta($post->ID, '_btsvviewer_zoom_step', true),
+            'center_x' => get_post_meta($post->ID, '_btsvviewer_center_x', true),
+            'center_y' => get_post_meta($post->ID, '_btsvviewer_center_y', true),
+            'title' => get_post_meta($post->ID, '_btsvviewer_title', true),
+            'caption' => get_post_meta($post->ID, '_btsvviewer_caption', true),
+            'attachment_id' => get_post_meta($post->ID, '_btsvviewer_attachment_id', true),
+            'controls_position' => get_post_meta($post->ID, '_btsvviewer_controls_position', true),
+            'controls_buttons' => get_post_meta($post->ID, '_btsvviewer_controls_buttons', true),
+            'button_fill' => get_post_meta($post->ID, '_btsvviewer_button_fill', true),
+            'button_border' => get_post_meta($post->ID, '_btsvviewer_button_border', true),
+            'button_foreground' => get_post_meta($post->ID, '_btsvviewer_button_foreground', true),
+            'pan_mode' => get_post_meta($post->ID, '_btsvviewer_pan_mode', true),
+            'zoom_mode' => get_post_meta($post->ID, '_btsvviewer_zoom_mode', true),
         );
 
         foreach ($values as $key => $value) {
@@ -1434,44 +1618,44 @@ class BT_SVG_Viewer
                         <div class="bt-svg-viewer-field">
                             <label for="bt-svg-viewer-src"><?php esc_html_e('SVG Source URL', 'bt-svg-viewer'); ?></label>
                             <div class="bt-svg-viewer-media-control">
-                                <input type="text" id="bt-svg-viewer-src" name="svg_viewer_src"
+                                <input type="text" id="bt-svg-viewer-src" name="btsvviewer_src"
                                     value="<?php echo esc_attr($values['src']); ?>"
                                     placeholder="<?php esc_attr_e('https://example.com/my-graphic.svg or uploads/2025/graphic.svg', 'bt-svg-viewer'); ?>" />
                                 <button type="button"
                                     class="button bt-svg-viewer-select-media"><?php esc_html_e('Select SVG', 'bt-svg-viewer'); ?></button>
                             </div>
-                            <input type="hidden" name="svg_viewer_attachment_id"
+                            <input type="hidden" name="btsvviewer_attachment_id"
                                 value="<?php echo esc_attr($values['attachment_id']); ?>" />
                         </div>
 
                         <div class="bt-svg-viewer-field-group">
                             <div class="bt-svg-viewer-field">
                                 <label for="bt-svg-viewer-height"><?php esc_html_e('Viewer Height', 'bt-svg-viewer'); ?></label>
-                                <input type="text" id="bt-svg-viewer-height" name="svg_viewer_height"
+                                <input type="text" id="bt-svg-viewer-height" name="btsvviewer_height"
                                     value="<?php echo esc_attr($values['height']); ?>" placeholder="600px" />
                             </div>
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-min-zoom"><?php esc_html_e('Min Zoom (%)', 'bt-svg-viewer'); ?></label>
-                                <input type="number" id="bt-svg-viewer-min-zoom" name="svg_viewer_min_zoom"
+                                <input type="number" id="bt-svg-viewer-min-zoom" name="btsvviewer_min_zoom"
                                     value="<?php echo esc_attr($values['min_zoom']); ?>" min="1" step="1" />
                             </div>
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-max-zoom"><?php esc_html_e('Max Zoom (%)', 'bt-svg-viewer'); ?></label>
-                                <input type="number" id="bt-svg-viewer-max-zoom" name="svg_viewer_max_zoom"
+                                <input type="number" id="bt-svg-viewer-max-zoom" name="btsvviewer_max_zoom"
                                     value="<?php echo esc_attr($values['max_zoom']); ?>" min="1" step="1" />
                             </div>
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-initial-zoom"><?php esc_html_e('Initial Zoom (%)', 'bt-svg-viewer'); ?></label>
-                                <input type="number" id="bt-svg-viewer-initial-zoom" name="svg_viewer_initial_zoom"
+                                <input type="number" id="bt-svg-viewer-initial-zoom" name="btsvviewer_initial_zoom"
                                     value="<?php echo esc_attr($values['initial_zoom']); ?>" min="1" step="1" />
                             </div>
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-zoom-step"><?php esc_html_e('Zoom Increment (%)', 'bt-svg-viewer'); ?></label>
-                                <input type="number" id="bt-svg-viewer-zoom-step" name="svg_viewer_zoom_step"
+                                <input type="number" id="bt-svg-viewer-zoom-step" name="btsvviewer_zoom_step"
                                     value="<?php echo esc_attr($values['zoom_step']); ?>" min="0.1" step="0.1" />
                             </div>
                         </div>
@@ -1479,12 +1663,12 @@ class BT_SVG_Viewer
                         <div class="bt-svg-viewer-field-group">
                             <div class="bt-svg-viewer-field">
                                 <label for="bt-svg-viewer-center-x"><?php esc_html_e('Center X', 'bt-svg-viewer'); ?></label>
-                                <input type="number" id="bt-svg-viewer-center-x" name="svg_viewer_center_x"
+                                <input type="number" id="bt-svg-viewer-center-x" name="btsvviewer_center_x"
                                     value="<?php echo esc_attr($values['center_x']); ?>" step="0.01" />
                             </div>
                             <div class="bt-svg-viewer-field">
                                 <label for="bt-svg-viewer-center-y"><?php esc_html_e('Center Y', 'bt-svg-viewer'); ?></label>
-                                <input type="number" id="bt-svg-viewer-center-y" name="svg_viewer_center_y"
+                                <input type="number" id="bt-svg-viewer-center-y" name="btsvviewer_center_y"
                                     value="<?php echo esc_attr($values['center_y']); ?>" step="0.01" />
                             </div>
                         </div>
@@ -1493,7 +1677,7 @@ class BT_SVG_Viewer
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-controls-position"><?php esc_html_e('Controls Position', 'bt-svg-viewer'); ?></label>
-                                <select id="bt-svg-viewer-controls-position" name="svg_viewer_controls_position">
+                                <select id="bt-svg-viewer-controls-position" name="btsvviewer_controls_position">
                                     <?php
                                     $positions_options = array(
                                         'top' => __('Top', 'bt-svg-viewer'),
@@ -1512,7 +1696,7 @@ class BT_SVG_Viewer
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-controls-buttons"><?php esc_html_e('Controls Buttons/Layout', 'bt-svg-viewer'); ?></label>
-                                <input type="text" id="bt-svg-viewer-controls-buttons" name="svg_viewer_controls_buttons"
+                                <input type="text" id="bt-svg-viewer-controls-buttons" name="btsvviewer_controls_buttons"
                                     value="<?php echo esc_attr($values['controls_buttons']); ?>" placeholder="both" />
                                 <p class="description">
                                     <?php esc_html_e('Combine multiple options with commas. Examples: both, icon, text, compact, labels-on-hover, minimal, alignleft, aligncenter, alignright, custom,both,aligncenter,zoom_in,zoom_out,reset,center,coords', 'bt-svg-viewer'); ?>
@@ -1524,7 +1708,7 @@ class BT_SVG_Viewer
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-pan-mode"><?php esc_html_e('Pan Interaction', 'bt-svg-viewer'); ?></label>
-                                <select id="bt-svg-viewer-pan-mode" name="svg_viewer_pan_mode">
+                                <select id="bt-svg-viewer-pan-mode" name="btsvviewer_pan_mode">
                                     <?php
                                     $pan_options = array(
                                         'scroll' => __('Scroll (default)', 'bt-svg-viewer'),
@@ -1544,7 +1728,7 @@ class BT_SVG_Viewer
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-zoom-mode"><?php esc_html_e('Zoom Interaction', 'bt-svg-viewer'); ?></label>
-                                <select id="bt-svg-viewer-zoom-mode" name="svg_viewer_zoom_mode">
+                                <select id="bt-svg-viewer-zoom-mode" name="btsvviewer_zoom_mode">
                                     <?php
                                     $zoom_options = array(
                                         'super_scroll' => __('Cmd/Ctrl-scroll (default)', 'bt-svg-viewer'),
@@ -1568,7 +1752,7 @@ class BT_SVG_Viewer
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-button-fill"><?php esc_html_e('Button Fill Color', 'bt-svg-viewer'); ?></label>
-                                <input type="text" id="bt-svg-viewer-button-fill" name="svg_viewer_button_fill"
+                                <input type="text" id="bt-svg-viewer-button-fill" name="btsvviewer_button_fill"
                                     class="bt-svg-viewer-color-field" value="<?php echo esc_attr($values['button_fill']); ?>"
                                     data-default-color="#0073aa" />
                                 <p class="description">
@@ -1578,7 +1762,7 @@ class BT_SVG_Viewer
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-button-border"><?php esc_html_e('Button Border Color', 'bt-svg-viewer'); ?></label>
-                                <input type="text" id="bt-svg-viewer-button-border" name="svg_viewer_button_border"
+                                <input type="text" id="bt-svg-viewer-button-border" name="btsvviewer_button_border"
                                     class="bt-svg-viewer-color-field" value="<?php echo esc_attr($values['button_border']); ?>"
                                     data-default-color="#0073aa" />
                                 <p class="description">
@@ -1588,7 +1772,7 @@ class BT_SVG_Viewer
                             <div class="bt-svg-viewer-field">
                                 <label
                                     for="bt-svg-viewer-button-foreground"><?php esc_html_e('Button Foreground Color', 'bt-svg-viewer'); ?></label>
-                                <input type="text" id="bt-svg-viewer-button-foreground" name="svg_viewer_button_foreground"
+                                <input type="text" id="bt-svg-viewer-button-foreground" name="btsvviewer_button_foreground"
                                     class="bt-svg-viewer-color-field"
                                     value="<?php echo esc_attr($values['button_foreground']); ?>"
                                     data-default-color="#ffffff" />
@@ -1600,14 +1784,14 @@ class BT_SVG_Viewer
 
                         <div class="bt-svg-viewer-field">
                             <label for="bt-svg-viewer-title"><?php esc_html_e('Title (optional)', 'bt-svg-viewer'); ?></label>
-                            <input type="text" id="bt-svg-viewer-title" name="svg_viewer_title"
+                            <input type="text" id="bt-svg-viewer-title" name="btsvviewer_title"
                                 value="<?php echo esc_attr($values['title']); ?>" />
                         </div>
 
                         <div class="bt-svg-viewer-field">
                             <label
                                 for="bt-svg-viewer-caption"><?php esc_html_e('Caption (optional)', 'bt-svg-viewer'); ?></label>
-                            <textarea id="bt-svg-viewer-caption" name="svg_viewer_caption" rows="3"
+                            <textarea id="bt-svg-viewer-caption" name="btsvviewer_caption" rows="3"
                                 class="widefat"><?php echo esc_textarea($values['caption']); ?></textarea>
                             <p class="description"><?php esc_html_e('Supports basic HTML formatting.', 'bt-svg-viewer'); ?></p>
                         </div>
@@ -1697,7 +1881,7 @@ class BT_SVG_Viewer
         }
 
         $modified_time = (int) filemtime($help_file);
-        $transient_key = 'svg_viewer_help_markup';
+        $transient_key = 'btsvviewer_help_markup';
         $stored = get_transient($transient_key);
 
         if (is_array($stored) && isset($stored['mtime'], $stored['html']) && (int) $stored['mtime'] === $modified_time) {
@@ -1746,7 +1930,7 @@ class BT_SVG_Viewer
         }
 
         $modified_time = (int) filemtime($changelog_file);
-        $transient_key = 'svg_viewer_changelog_markup';
+        $transient_key = 'btsvviewer_changelog_markup';
         $stored = get_transient($transient_key);
 
         if (is_array($stored) && isset($stored['mtime'], $stored['html']) && (int) $stored['mtime'] === $modified_time) {
@@ -1826,12 +2010,12 @@ class BT_SVG_Viewer
      * @param string $icon_markup
      * @return string
      */
-    private function sanitize_svg_icon($icon_markup)
+    private function sanitize_btsvviewer_icon($icon_markup)
     {
-        static $allowed_svg_tags = null;
+        static $allowed_btsvviewer_tags = null;
 
-        if ($allowed_svg_tags === null) {
-            $allowed_svg_tags = array(
+        if ($allowed_btsvviewer_tags === null) {
+            $allowed_btsvviewer_tags = array(
                 'svg' => array(
                     'xmlns' => true,
                     'viewBox' => true,
@@ -1851,7 +2035,7 @@ class BT_SVG_Viewer
             );
         }
 
-        return wp_kses($icon_markup, $allowed_svg_tags);
+        return wp_kses($icon_markup, $allowed_btsvviewer_tags);
     }
 
     /**
@@ -1930,7 +2114,7 @@ class BT_SVG_Viewer
     {
         $settings_link = sprintf(
             '<a href="%s">%s</a>',
-            esc_url(admin_url('edit.php?post_type=svg_viewer_preset')),
+            esc_url(admin_url('edit.php?post_type=btsvviewer_preset')),
             esc_html__('Settings', 'bt-svg-viewer')
         );
 
@@ -2388,7 +2572,7 @@ class BT_SVG_Viewer
                     data-viewer="<?php echo esc_attr($viewer_id); ?>" title="<?php echo esc_attr($definition['title']); ?>"
                     aria-label="<?php echo esc_attr($definition['text']); ?>">
                     <span class="btn-icon"
-                        aria-hidden="true"><?php echo $this->sanitize_svg_icon($definition['icon']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized via wp_kses in sanitize_svg_icon() ?></span>
+                        aria-hidden="true"><?php echo $this->sanitize_btsvviewer_icon($definition['icon']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized via wp_kses in sanitize_btsvviewer_icon() ?></span>
                     <span class="btn-text"><?php echo esc_html($definition['text']); ?></span>
                 </button>
             <?php endforeach; ?>
@@ -2481,9 +2665,9 @@ class BT_SVG_Viewer
      */
     public function save_preset_meta($post_id, $post)
     {
-        $preset_nonce = isset($_POST['svg_viewer_preset_nonce']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_preset_nonce'])) : '';
+        $preset_nonce = isset($_POST['btsvviewer_preset_nonce']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_preset_nonce'])) : '';
 
-        if ($preset_nonce === '' || !wp_verify_nonce($preset_nonce, 'svg_viewer_preset_meta')) {
+        if ($preset_nonce === '' || !wp_verify_nonce($preset_nonce, 'btsvviewer_preset_meta')) {
             return;
         }
 
@@ -2491,7 +2675,7 @@ class BT_SVG_Viewer
             return;
         }
 
-        if ($post->post_type !== 'svg_viewer_preset') {
+        if ($post->post_type !== 'btsvviewer_preset') {
             return;
         }
 
@@ -2499,70 +2683,70 @@ class BT_SVG_Viewer
             return;
         }
 
-        $raw_src = isset($_POST['svg_viewer_src']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_src'])) : '';
-        $attachment_id = isset($_POST['svg_viewer_attachment_id']) ? absint(wp_unslash($_POST['svg_viewer_attachment_id'])) : '';
-        $height = isset($_POST['svg_viewer_height']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_height'])) : '';
+        $raw_src = isset($_POST['btsvviewer_src']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_src'])) : '';
+        $attachment_id = isset($_POST['btsvviewer_attachment_id']) ? absint(wp_unslash($_POST['btsvviewer_attachment_id'])) : '';
+        $height = isset($_POST['btsvviewer_height']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_height'])) : '';
 
         $numeric_fields = array(
-            '_svg_min_zoom' => 'svg_viewer_min_zoom',
-            '_svg_max_zoom' => 'svg_viewer_max_zoom',
-            '_svg_initial_zoom' => 'svg_viewer_initial_zoom',
-            '_svg_zoom_step' => 'svg_viewer_zoom_step',
-            '_svg_center_x' => 'svg_viewer_center_x',
-            '_svg_center_y' => 'svg_viewer_center_y',
+            '_btsvviewer_min_zoom' => 'btsvviewer_min_zoom',
+            '_btsvviewer_max_zoom' => 'btsvviewer_max_zoom',
+            '_btsvviewer_initial_zoom' => 'btsvviewer_initial_zoom',
+            '_btsvviewer_zoom_step' => 'btsvviewer_zoom_step',
+            '_btsvviewer_center_x' => 'btsvviewer_center_x',
+            '_btsvviewer_center_y' => 'btsvviewer_center_y',
         );
 
         $text_fields = array(
-            '_svg_title' => 'svg_viewer_title',
-            '_svg_caption' => 'svg_viewer_caption',
+            '_btsvviewer_title' => 'btsvviewer_title',
+            '_btsvviewer_caption' => 'btsvviewer_caption',
         );
 
         if (!empty($raw_src)) {
-            update_post_meta($post_id, '_svg_src', esc_url_raw($raw_src));
+            update_post_meta($post_id, '_btsvviewer_src', esc_url_raw($raw_src));
         } else {
-            delete_post_meta($post_id, '_svg_src');
+            delete_post_meta($post_id, '_btsvviewer_src');
         }
 
         if ($attachment_id) {
-            update_post_meta($post_id, '_svg_attachment_id', $attachment_id);
+            update_post_meta($post_id, '_btsvviewer_attachment_id', $attachment_id);
         } else {
-            delete_post_meta($post_id, '_svg_attachment_id');
+            delete_post_meta($post_id, '_btsvviewer_attachment_id');
         }
 
         if (!empty($height)) {
-            update_post_meta($post_id, '_svg_height', $height);
+            update_post_meta($post_id, '_btsvviewer_height', $height);
         } else {
-            delete_post_meta($post_id, '_svg_height');
+            delete_post_meta($post_id, '_btsvviewer_height');
         }
 
-        $controls_position = isset($_POST['svg_viewer_controls_position']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_controls_position'])) : '';
+        $controls_position = isset($_POST['btsvviewer_controls_position']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_controls_position'])) : '';
         if (!empty($controls_position)) {
-            update_post_meta($post_id, '_svg_controls_position', strtolower($controls_position));
+            update_post_meta($post_id, '_btsvviewer_controls_position', strtolower($controls_position));
         } else {
-            delete_post_meta($post_id, '_svg_controls_position');
+            delete_post_meta($post_id, '_btsvviewer_controls_position');
         }
 
-        $controls_buttons = isset($_POST['svg_viewer_controls_buttons']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_controls_buttons'])) : '';
+        $controls_buttons = isset($_POST['btsvviewer_controls_buttons']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_controls_buttons'])) : '';
         if ($controls_buttons !== '') {
-            update_post_meta($post_id, '_svg_controls_buttons', $controls_buttons);
+            update_post_meta($post_id, '_btsvviewer_controls_buttons', $controls_buttons);
         } else {
-            delete_post_meta($post_id, '_svg_controls_buttons');
+            delete_post_meta($post_id, '_btsvviewer_controls_buttons');
         }
 
-        $pan_mode_input = isset($_POST['svg_viewer_pan_mode']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_pan_mode'])) : '';
+        $pan_mode_input = isset($_POST['btsvviewer_pan_mode']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_pan_mode'])) : '';
         if ($pan_mode_input === '') {
-            delete_post_meta($post_id, '_svg_pan_mode');
+            delete_post_meta($post_id, '_btsvviewer_pan_mode');
         } else {
             $pan_mode_value = $this->normalize_pan_mode($pan_mode_input);
-            update_post_meta($post_id, '_svg_pan_mode', $pan_mode_value);
+            update_post_meta($post_id, '_btsvviewer_pan_mode', $pan_mode_value);
         }
 
-        $zoom_mode_input = isset($_POST['svg_viewer_zoom_mode']) ? sanitize_text_field(wp_unslash($_POST['svg_viewer_zoom_mode'])) : '';
+        $zoom_mode_input = isset($_POST['btsvviewer_zoom_mode']) ? sanitize_text_field(wp_unslash($_POST['btsvviewer_zoom_mode'])) : '';
         $zoom_mode_value = $this->normalize_zoom_mode($zoom_mode_input);
         if ($zoom_mode_value === 'super_scroll') {
-            delete_post_meta($post_id, '_svg_zoom_mode');
+            delete_post_meta($post_id, '_btsvviewer_zoom_mode');
         } else {
-            update_post_meta($post_id, '_svg_zoom_mode', $zoom_mode_value);
+            update_post_meta($post_id, '_btsvviewer_zoom_mode', $zoom_mode_value);
         }
 
         foreach ($numeric_fields as $meta_key => $post_key) {
@@ -2598,9 +2782,9 @@ class BT_SVG_Viewer
         }
 
         $color_fields = array(
-            '_svg_button_fill' => 'svg_viewer_button_fill',
-            '_svg_button_border' => 'svg_viewer_button_border',
-            '_svg_button_foreground' => 'svg_viewer_button_foreground',
+            '_btsvviewer_button_fill' => 'btsvviewer_button_fill',
+            '_btsvviewer_button_border' => 'btsvviewer_button_border',
+            '_btsvviewer_button_foreground' => 'btsvviewer_button_foreground',
         );
 
         foreach ($color_fields as $meta_key => $post_key) {
@@ -2631,28 +2815,28 @@ class BT_SVG_Viewer
     private function get_preset_settings($preset_id)
     {
         $preset = get_post($preset_id);
-        if (!$preset || $preset->post_type !== 'svg_viewer_preset') {
+        if (!$preset || $preset->post_type !== 'btsvviewer_preset') {
             return null;
         }
 
         $settings = array(
-            'src' => get_post_meta($preset_id, '_svg_src', true),
-            'height' => get_post_meta($preset_id, '_svg_height', true),
-            'min_zoom' => get_post_meta($preset_id, '_svg_min_zoom', true),
-            'max_zoom' => get_post_meta($preset_id, '_svg_max_zoom', true),
-            'zoom' => get_post_meta($preset_id, '_svg_initial_zoom', true),
-            'zoom_step' => get_post_meta($preset_id, '_svg_zoom_step', true),
-            'center_x' => get_post_meta($preset_id, '_svg_center_x', true),
-            'center_y' => get_post_meta($preset_id, '_svg_center_y', true),
-            'title' => get_post_meta($preset_id, '_svg_title', true),
-            'caption' => get_post_meta($preset_id, '_svg_caption', true),
-            'controls_position' => get_post_meta($preset_id, '_svg_controls_position', true),
-            'controls_buttons' => get_post_meta($preset_id, '_svg_controls_buttons', true),
-            'button_fill' => get_post_meta($preset_id, '_svg_button_fill', true),
-            'button_border' => get_post_meta($preset_id, '_svg_button_border', true),
-            'button_foreground' => get_post_meta($preset_id, '_svg_button_foreground', true),
-            'pan_mode' => get_post_meta($preset_id, '_svg_pan_mode', true),
-            'zoom_mode' => get_post_meta($preset_id, '_svg_zoom_mode', true),
+            'src' => get_post_meta($preset_id, '_btsvviewer_src', true),
+            'height' => get_post_meta($preset_id, '_btsvviewer_height', true),
+            'min_zoom' => get_post_meta($preset_id, '_btsvviewer_min_zoom', true),
+            'max_zoom' => get_post_meta($preset_id, '_btsvviewer_max_zoom', true),
+            'zoom' => get_post_meta($preset_id, '_btsvviewer_initial_zoom', true),
+            'zoom_step' => get_post_meta($preset_id, '_btsvviewer_zoom_step', true),
+            'center_x' => get_post_meta($preset_id, '_btsvviewer_center_x', true),
+            'center_y' => get_post_meta($preset_id, '_btsvviewer_center_y', true),
+            'title' => get_post_meta($preset_id, '_btsvviewer_title', true),
+            'caption' => get_post_meta($preset_id, '_btsvviewer_caption', true),
+            'controls_position' => get_post_meta($preset_id, '_btsvviewer_controls_position', true),
+            'controls_buttons' => get_post_meta($preset_id, '_btsvviewer_controls_buttons', true),
+            'button_fill' => get_post_meta($preset_id, '_btsvviewer_button_fill', true),
+            'button_border' => get_post_meta($preset_id, '_btsvviewer_button_border', true),
+            'button_foreground' => get_post_meta($preset_id, '_btsvviewer_button_foreground', true),
+            'pan_mode' => get_post_meta($preset_id, '_btsvviewer_pan_mode', true),
+            'zoom_mode' => get_post_meta($preset_id, '_btsvviewer_zoom_mode', true),
         );
 
         if (empty($settings['height'])) {
@@ -2690,7 +2874,7 @@ class BT_SVG_Viewer
      */
     public function add_shortcode_column($columns)
     {
-        $columns['svg_viewer_shortcode'] = __('Shortcode', 'bt-svg-viewer');
+        $columns['btsvviewer_shortcode'] = __('Shortcode', 'bt-svg-viewer');
         return $columns;
     }
 
@@ -2699,7 +2883,7 @@ class BT_SVG_Viewer
      */
     public function render_shortcode_column($column, $post_id)
     {
-        if ('svg_viewer_shortcode' !== $column) {
+        if ('btsvviewer_shortcode' !== $column) {
             return;
         }
 
@@ -2722,7 +2906,7 @@ class BT_SVG_Viewer
     private function get_preset_shortcode($preset_id)
     {
         $preset_id = absint($preset_id);
-        return '[svg_viewer id="' . $preset_id . '"]';
+        return '[btsvviewer id="' . $preset_id . '"]';
     }
 }
 

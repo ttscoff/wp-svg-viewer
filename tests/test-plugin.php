@@ -66,14 +66,14 @@ class BT_SVG_Viewer_Tests extends WP_UnitTestCase
 
         $preset_id = self::factory()->post->create(
             array(
-                'post_type' => 'svg_viewer_preset',
+                'post_type' => 'btsvviewer_preset',
                 'post_status' => 'publish',
                 'post_title' => 'Override Test Preset',
             )
         );
 
-        update_post_meta($preset_id, '_svg_src', 'preset-image.svg');
-        update_post_meta($preset_id, '_svg_button_fill', '#123456');
+        update_post_meta($preset_id, '_btsvviewer_src', 'preset-image.svg');
+        update_post_meta($preset_id, '_btsvviewer_button_fill', '#123456');
 
         $output = self::$plugin->render_shortcode(
             array(
@@ -154,7 +154,7 @@ class BT_SVG_Viewer_Tests extends WP_UnitTestCase
     /**
      * Ensure the plugin adds SVG support to the mime type list.
      */
-    public function test_svg_mime_type_is_added()
+    public function test_btsvviewer_mime_type_is_added()
     {
         $existing = array(
             'jpg' => 'image/jpeg',
@@ -235,16 +235,16 @@ class BT_SVG_Viewer_Tests extends WP_UnitTestCase
 
         $preset_id = self::factory()->post->create(
             array(
-                'post_type' => 'svg_viewer_preset',
+                'post_type' => 'btsvviewer_preset',
                 'post_status' => 'publish',
                 'post_title' => 'Preset',
             )
         );
 
-        update_post_meta($preset_id, '_svg_src', 'preset-path.svg');
-        update_post_meta($preset_id, '_svg_initial_zoom', 200);
-        update_post_meta($preset_id, '_svg_pan_mode', 'drag');
-        update_post_meta($preset_id, '_svg_zoom_mode', 'click');
+        update_post_meta($preset_id, '_btsvviewer_src', 'preset-path.svg');
+        update_post_meta($preset_id, '_btsvviewer_initial_zoom', 200);
+        update_post_meta($preset_id, '_btsvviewer_pan_mode', 'drag');
+        update_post_meta($preset_id, '_btsvviewer_zoom_mode', 'click');
 
         $output = self::$plugin->render_shortcode(
             array(

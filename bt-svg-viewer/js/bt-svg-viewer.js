@@ -1612,8 +1612,8 @@ if (typeof window !== "undefined") {
       if (!global[instancesKey]) {
         global[instancesKey] = {};
       }
-      if (!global.svgViewerInstances) {
-        global.svgViewerInstances = global[instancesKey];
+      if (!global.btsvviewerInstances) {
+        global.btsvviewerInstances = global[instancesKey];
       }
       if (!Array.isArray(global[queueName])) {
         global[queueName] = [];
@@ -1627,7 +1627,7 @@ if (typeof window !== "undefined") {
       try {
         const instance = new global.SVGViewer(config);
         global[instancesKey][config.viewerId] = instance;
-        global.svgViewerInstances[config.viewerId] = instance;
+        global.btsvviewerInstances[config.viewerId] = instance;
       } catch (error) {
         if (typeof console !== "undefined" && console.error) {
           console.error("BT SVG Viewer init failed:", error);

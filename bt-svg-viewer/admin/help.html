@@ -63,7 +63,7 @@
 
 <h2 id="quickstart">Quick Start</h2>
 
-<pre><code class="text">[svg_viewer src=&quot;/wp-content/uploads/diagrams/system-map.svg&quot;]
+<pre><code class="text">[btsvviewer src=&quot;/wp-content/uploads/diagrams/system-map.svg&quot;]
 </code></pre>
 
 <ul>
@@ -259,7 +259,7 @@
 
 <p>Example:</p>
 
-<pre><code class="text">[svg_viewer
+<pre><code class="text">[btsvviewer
   src=&quot;/uploads/system-map.svg&quot;
   controls_position=&quot;right&quot;
   controls_buttons=&quot;slider,icon,aligncenter,reset,center&quot;
@@ -337,7 +337,7 @@
 <h3 id="presetshortcodes">Preset Shortcodes</h3>
 
 <ul>
-<li>At the top of the preset editor and in the presets list table you???ll find a copy-ready snippet in the form of <code>[svg_viewer id=&quot;123&quot;]</code>.</li>
+<li>At the top of the preset editor and in the presets list table you???ll find a copy-ready snippet in the form of <code>[btsvviewer id=&quot;123&quot;]</code>.</li>
 <li>Click <strong>Copy</strong> to put the shortcode on the clipboard without selecting manually.</li>
 </ul>
 
@@ -354,7 +354,7 @@
 
 <ol>
 <li>Create or edit a preset as described above.</li>
-<li>Copy the generated shortcode (<code>[svg_viewer id=&quot;123&quot;]</code>).</li>
+<li>Copy the generated shortcode (<code>[btsvviewer id=&quot;123&quot;]</code>).</li>
 <li>Paste into:</li>
 </ol>
 
@@ -368,7 +368,7 @@
 <li>Override on a per-use basis if needed:</li>
 </ol>
 
-<pre><code class="```text">   [svg_viewer id=&quot;123&quot; controls_buttons=&quot;icon,alignright,zoom_in,zoom_out&quot;]
+<pre><code class="```text">   [btsvviewer id=&quot;123&quot; controls_buttons=&quot;icon,alignright,zoom_in,zoom_out&quot;]
 
 </code></pre>
 
@@ -388,10 +388,10 @@
 
 <h2 id="examples">Examples</h2>
 
-<pre><code class="text">[svg_viewer src=&quot;/uploads/floorplan.svg&quot;]
+<pre><code class="text">[btsvviewer src=&quot;/uploads/floorplan.svg&quot;]
 </code></pre>
 
-<pre><code class="text">[svg_viewer
+<pre><code class="text">[btsvviewer
   src=&quot;/uploads/system-map.svg&quot;
   height=&quot;100vh&quot;
   controls_position=&quot;bottom&quot;
@@ -402,20 +402,20 @@
 ]
 </code></pre>
 
-<pre><code class="text">[svg_viewer
+<pre><code class="text">[btsvviewer
   id=&quot;42&quot;
   controls_buttons=&quot;custom:slider,zoom_in,zoom_out,reset&quot;
 ]
 </code></pre>
 
-<pre><code class="text">[svg_viewer
+<pre><code class="text">[btsvviewer
   src=&quot;/uploads/mind-map.svg&quot;
   show_coords=&quot;true&quot;
   controls_buttons=&quot;icon,alignleft,zoom_in,zoom_out,reset,center,coords&quot;
 ]
 </code></pre>
 
-<pre><code class="text">[svg_viewer
+<pre><code class="text">[btsvviewer
   src=&quot;/uploads/campus-map.svg&quot;
   button_bg=&quot;#2f855a&quot;
   button_border=&quot;#22543d&quot;
@@ -500,7 +500,7 @@
 <h3 id="debugging">Debugging</h3>
 
 <ul>
-<li>Toggle <code>show_coords=&quot;true&quot;</code> or inspect <code>window.svgViewerInstances['viewer-id']</code> to troubleshoot zoom, center, or scroll behaviour.</li>
+<li>Toggle <code>show_coords=&quot;true&quot;</code> or inspect <code>window.btsvviewerInstances['viewer-id']</code> to troubleshoot zoom, center, or scroll behaviour.</li>
 <li>Use the Defaults tab???s <strong>Enable asset cache busting for debugging</strong> switch if your browser clings to stale copies of the viewer script or styles.</li>
 </ul>
 

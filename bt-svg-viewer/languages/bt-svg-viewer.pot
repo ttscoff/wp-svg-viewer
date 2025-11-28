@@ -18,7 +18,7 @@ msgid "Error: SVG preset not found for ID %s."
 msgstr ""
 
 #: bt-svg-viewer-plugin.php
-msgid "Error: SVG source not specified. Use [svg_viewer src=\"path/to/file.svg\"]"
+msgid "Error: SVG source not specified. Use [btsvviewer src=\"path/to/file.svg\"]"
 msgstr ""
 
 #: bt-svg-viewer-plugin.php

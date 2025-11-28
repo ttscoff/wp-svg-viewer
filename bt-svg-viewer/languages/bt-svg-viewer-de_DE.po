@@ -54,8 +54,8 @@ msgstr "Ziehen zum Schwenken des Bildes."
 msgid "Error: SVG preset not found for ID %s."
 msgstr "Fehler: SVG-Voreinstellung wurde für die ID %s nicht gefunden."
 
-msgid "Error: SVG source not specified. Use [svg_viewer src=\"path/to/file.svg\"]"
-msgstr "Fehler: SVG-Quelle nicht angegeben. Verwenden Sie [svg_viewer src=\"path/to/file.svg\"]"
+msgid "Error: SVG source not specified. Use [btsvviewer src=\"path/to/file.svg\"]"
+msgstr "Fehler: SVG-Quelle nicht angegeben. Verwenden Sie [btsvviewer src=\"path/to/file.svg\"]"
 
 msgid "Error: Invalid SVG path."
 msgstr "Fehler: Ungültiger SVG-Pfad."

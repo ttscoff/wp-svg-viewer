@@ -5,7 +5,7 @@ Tags: svg, shortcode, maps, zoom, viewer
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.19
+Stable tag: 1.0.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,10 +24,10 @@ Embed large, detailed SVG diagrams in WordPress with an accessible viewer that s
 * Localized UI and strings in English, German, Spanish, French, and Italian.
 
 = Shortcode Overview =
-Use the `[svg_viewer]` shortcode anywhere shortcodes are supported. Pass a direct SVG URL or reference a saved preset ID. All shortcode attributes (height, zoom limits, controls layout, button colors, etc.) can be overridden per instance. See the plugin’s admin Help tab or project README for a full attribute reference and examples.
+Use the `[btsvviewer]` shortcode anywhere shortcodes are supported. Pass a direct SVG URL or reference a saved preset ID. All shortcode attributes (height, zoom limits, controls layout, button colors, etc.) can be overridden per instance. See the plugin’s admin Help tab or project README for a full attribute reference and examples. Existing shortcodes created before the rename continue to render, so archived posts don’t need to be touched.
 
 = Preset Workflow =
-Create a preset from **BT SVG Viewer → Presets** in the admin. Upload an SVG, tune the controls, tweak button colors, then load the preview to dial in the initial zoom and center point. Save the preset and drop the generated `[svg_viewer id="123"]` shortcode wherever you need the viewer. Inline attributes always win over stored preset values, making it easy to reuse a baseline configuration.
+Create a preset from **BT SVG Viewer → Presets** in the admin. Upload an SVG, tune the controls, tweak button colors, then load the preview to dial in the initial zoom and center point. Save the preset and drop the generated `[btsvviewer id="123"]` shortcode wherever you need the viewer. Inline attributes always win over stored preset values, making it easy to reuse a baseline configuration.
 
 == Localization ==
 
@@ -39,7 +39,7 @@ Translations were initially produced with AI assistance; corrections are welcome
 
 1. Upload the `bt-svg-viewer` folder to the `/wp-content/plugins/` directory, or install the ZIP archive via **Plugins → Add New → Upload Plugin**.
 2. Activate the plugin through the **Plugins** menu in WordPress.
-3. Go to **BT SVG Viewer → Presets** to create your first reusable configuration, or place the basic shortcode `[svg_viewer src="/wp-content/uploads/diagram.svg"]` in a post or page.
+3. Go to **BT SVG Viewer → Presets** to create your first reusable configuration, or place the basic shortcode `[btsvviewer src="/wp-content/uploads/diagram.svg"]` in a post or page.
 
 == Frequently Asked Questions ==
 
@@ -47,13 +47,13 @@ Translations were initially produced with AI assistance; corrections are welcome
 Make sure the SVG URL is reachable by the browser. Open the path in a new tab to confirm it loads without authentication. The plugin accepts absolute URLs, `/wp-content/...` paths, and upload-relative paths (e.g. `2025/map.svg`). Also confirm the SVG includes a valid `viewBox` so it can scale correctly.
 
 = Can I override preset values inside the shortcode? =
-Yes. Attributes you place in the shortcode always override the stored preset settings. For example, `[svg_viewer id="42" controls_buttons="icon,zoom_in,zoom_out"]` keeps the preset’s other values but changes the control layout.
+Yes. Attributes you place in the shortcode always override the stored preset settings. For example, `[btsvviewer id="42" controls_buttons="icon,zoom_in,zoom_out"]` keeps the preset’s other values but changes the control layout.
 
 = How do I customize button colors? =
 Use the preset color pickers or shortcode aliases such as `button_fill`, `button_border`, and `button_foreground`. Legacy aliases `button_bg` and `button_fg` still work and map to the new properties. You can also target the wrapper’s CSS custom properties (e.g. `--bt-svg-viewer-button-fill`) in your theme.
 
 = Can I add multiple SVG viewers on one page? =
-Absolutely. Each `[svg_viewer]` instance manages its own state, so you can embed as many as you like on the same post or template.
+Absolutely. Each `[btsvviewer]` instance manages its own state, so you can embed as many as you like on the same post or template.
 
 = Does the plugin sanitize inline SVG icons? =
 All bundled icon markup runs through `wp_kses` to keep the controls safe. Uploaded SVG files are not altered, so continue following your organization’s SVG hygiene best practices.
@@ -102,4 +102,4 @@ All bundled icon markup runs through `wp_kses` to keep the controls safe. Upload
 * Allow the preview to capture its current zoom and center for quick authoring.
 
 = 1.0.0 =
-* Initial release with `[svg_viewer]` shortcode, zoom controls, and pan gestures.
+* Initial release with `[btsvviewer]` shortcode, zoom controls, and pan gestures.

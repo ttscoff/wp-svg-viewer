@@ -53,8 +53,8 @@ msgstr "Arrastra para desplazarte por la imagen."
 msgid "Error: SVG preset not found for ID %s."
 msgstr "Error: no se encontró el ajuste preestablecido SVG para el ID %s."
 
-msgid "Error: SVG source not specified. Use [svg_viewer src=\"path/to/file.svg\"]"
-msgstr "Error: no se especificó la fuente SVG. Usa [svg_viewer src=\"path/to/file.svg\"]"
+msgid "Error: SVG source not specified. Use [btsvviewer src=\"path/to/file.svg\"]"
+msgstr "Error: no se especificó la fuente SVG. Usa [btsvviewer src=\"path/to/file.svg\"]"
 
 msgid "Error: Invalid SVG path."
 msgstr "Error: ruta SVG no válida."

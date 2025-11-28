@@ -56,8 +56,8 @@ msgstr "Trascina per spostarti nell’immagine."
 msgid "Error: SVG preset not found for ID %s."
 msgstr "Errore: preset SVG non trovato per l'ID %s."
 
-msgid "Error: SVG source not specified. Use [svg_viewer src=\"path/to/file.svg\"]"
-msgstr "Errore: origine SVG non specificata. Usa [svg_viewer src=\"path/to/file.svg\"]"
+msgid "Error: SVG source not specified. Use [btsvviewer src=\"path/to/file.svg\"]"
+msgstr "Errore: origine SVG non specificata. Usa [btsvviewer src=\"path/to/file.svg\"]"
 
 msgid "Error: Invalid SVG path."
 msgstr "Errore: percorso SVG non valido."

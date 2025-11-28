@@ -46,11 +46,12 @@ Embed large SVG diagrams in WordPress with zoom, pan, center, and authoring tool
 ## Quick Start
 
 ```text
-[svg_viewer src="/wp-content/uploads/diagrams/system-map.svg"]
+[btsvviewer src="/wp-content/uploads/diagrams/system-map.svg"]
 ```
 
 - Place the shortcode in a classic editor, Gutenberg shortcode block, or template.
 - The SVG renders with default height (600px), zoom controls, pan/scroll behaviour, keyboard shortcuts, and responsive layout. Zoom buttons now gray out at the minimum/maximum zoom to make the limits obvious to visitors.
+- Existing shortcodes created before the rename continue to render, so archived posts don’t need updates.
 
 ---
 
@@ -114,7 +115,7 @@ Button names (pick any order):
 Example:
 
 ```text
-[svg_viewer
+[btsvviewer
   src="/uploads/system-map.svg"
   controls_position="right"
   controls_buttons="slider,icon,aligncenter,reset,center"
@@ -151,7 +152,7 @@ Example:
 
 ### Preset Shortcodes
 
-- At the top of the preset editor and in the presets list table you’ll find a copy-ready snippet in the form of `[svg_viewer id="123"]`.
+- At the top of the preset editor and in the presets list table you’ll find a copy-ready snippet in the form of `[btsvviewer id="123"]`.
 - Click **Copy** to put the shortcode on the clipboard without selecting manually.
 
 ### Defaults Tab
@@ -164,7 +165,7 @@ Example:
 ## Using Presets in Posts/Pages
 
 1. Create or edit a preset as described above.
-2. Copy the generated shortcode (`[svg_viewer id="123"]`).
+2. Copy the generated shortcode (`[btsvviewer id="123"]`).
 3. Paste into:
    - Classic editor (Visual tab: use Shortcode block or paste directly).
    - Block editor (Shortcode block or HTML block).
@@ -172,7 +173,7 @@ Example:
 4. Override on a per-use basis if needed:
 
    ```text
-   [svg_viewer id="123" controls_buttons="icon,alignright,zoom_in,zoom_out"]
+   [btsvviewer id="123" controls_buttons="icon,alignright,zoom_in,zoom_out"]
    ```
 
 ---
@@ -190,11 +191,11 @@ Example:
 ## Examples
 
 ```text
-[svg_viewer src="/uploads/floorplan.svg"]
+[btsvviewer src="/uploads/floorplan.svg"]
 ```
 
 ```text
-[svg_viewer
+[btsvviewer
   src="/uploads/system-map.svg"
   height="100vh"
   controls_position="bottom"
@@ -206,14 +207,14 @@ Example:
 ```
 
 ```text
-[svg_viewer
+[btsvviewer
   id="42"
   controls_buttons="custom:slider,zoom_in,zoom_out,reset"
 ]
 ```
 
 ```text
-[svg_viewer
+[btsvviewer
   src="/uploads/mind-map.svg"
   show_coords="true"
   controls_buttons="icon,alignleft,zoom_in,zoom_out,reset,center,coords"
@@ -221,7 +222,7 @@ Example:
 ```
 
 ```text
-[svg_viewer
+[btsvviewer
   src="/uploads/campus-map.svg"
   button_bg="#2f855a"
   button_border="#22543d"
@@ -301,7 +302,7 @@ Example overrides:
 
 ### Debugging
 
-- Toggle `show_coords="true"` or inspect `window.svgViewerInstances['viewer-id']` to troubleshoot zoom, center, or scroll behaviour.
+- Toggle `show_coords="true"` or inspect `window.btsvviewerInstances['viewer-id']` to troubleshoot zoom, center, or scroll behaviour.
 - Use the Defaults tab’s **Enable asset cache busting for debugging** switch if your browser clings to stale copies of the viewer script or styles.
 
 ---

@@ -1,11 +1,11 @@
 (function ($) {
   function getI18n(key, fallback) {
     if (
-      window.svgViewerAdmin &&
-      svgViewerAdmin.i18n &&
-      svgViewerAdmin.i18n[key]
+      window.btsvviewerAdmin &&
+      btsvviewerAdmin.i18n &&
+      btsvviewerAdmin.i18n[key]
     ) {
-      return svgViewerAdmin.i18n[key];
+      return btsvviewerAdmin.i18n[key];
     }
     return fallback;
   }
@@ -59,11 +59,11 @@
 
   function getFormDefaults() {
     if (
-      window.svgViewerAdmin &&
-      svgViewerAdmin.formDefaults &&
-      typeof svgViewerAdmin.formDefaults === "object"
+      window.btsvviewerAdmin &&
+      btsvviewerAdmin.formDefaults &&
+      typeof btsvviewerAdmin.formDefaults === "object"
     ) {
-      return svgViewerAdmin.formDefaults;
+      return btsvviewerAdmin.formDefaults;
     }
     return {};
   }
@@ -131,13 +131,13 @@
     const order = [];
     const seenKeys = new Set();
 
-    $metaBox.find("[name^='svg_viewer_']").each(function () {
+    $metaBox.find("[name^='btsvviewer_']").each(function () {
       const $field = $(this);
       const name = $field.attr("name");
       if (!name) {
         return;
       }
-      const baseKey = name.replace(/^svg_viewer_/, "");
+      const baseKey = name.replace(/^btsvviewer_/, "");
       if (!baseKey || seenKeys.has(baseKey)) {
         return;
       }
@@ -205,7 +205,7 @@
       return "";
     }
 
-    return "[svg_viewer " + parts.join(" ") + "]";
+    return "[btsvviewer " + parts.join(" ") + "]";
   }
 
   function initTabs($root) {
@@ -298,9 +298,9 @@
   };
 
   const BUTTON_DEFS =
-    (window.svgViewerAdmin &&
-      svgViewerAdmin.controls &&
-      svgViewerAdmin.controls.buttons) ||
+    (window.btsvviewerAdmin &&
+      btsvviewerAdmin.controls &&
+      btsvviewerAdmin.controls.buttons) ||
     DEFAULT_BUTTON_DEFS;
 
   const MODE_OPTIONS = ["icon", "text", "both"];
@@ -937,29 +937,29 @@
 
     const buttonFill = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_button_fill"]',
+      'input[name="btsvviewer_button_fill"]',
       ""
     );
     const buttonBorder = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_button_border"]',
+      'input[name="btsvviewer_button_border"]',
       ""
     );
     const buttonForeground = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_button_foreground"]',
+      'input[name="btsvviewer_button_foreground"]',
       ""
     );
     applyButtonColors($wrapper, buttonFill, buttonBorder, buttonForeground);
 
     const src = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_src"]',
+      'input[name="btsvviewer_src"]',
       ""
     ).trim();
     if (!src) {
       alert(
-        (window.svgViewerAdmin && svgViewerAdmin.i18n.missingSrc) ||
+        (window.btsvviewerAdmin && btsvviewerAdmin.i18n.missingSrc) ||
           "Please select an SVG before loading the preview."
       );
       return;
@@ -967,59 +967,59 @@
 
     const height = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_height"]',
+      'input[name="btsvviewer_height"]',
       "600px"
     );
     const minZoomPercent = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_min_zoom"]',
+      'input[name="btsvviewer_min_zoom"]',
       "25"
     );
     const maxZoomPercent = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_max_zoom"]',
+      'input[name="btsvviewer_max_zoom"]',
       "800"
     );
     const initialZoomPercent = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_initial_zoom"]',
+      'input[name="btsvviewer_initial_zoom"]',
       "100"
     );
     const zoomStepPercent = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_zoom_step"]',
+      'input[name="btsvviewer_zoom_step"]',
       "10"
     );
     const centerX = parseFloatOrNull(
-      getFieldValue($metaBox, 'input[name="svg_viewer_center_x"]', "")
+      getFieldValue($metaBox, 'input[name="btsvviewer_center_x"]', "")
     );
     const centerY = parseFloatOrNull(
-      getFieldValue($metaBox, 'input[name="svg_viewer_center_y"]', "")
+      getFieldValue($metaBox, 'input[name="btsvviewer_center_y"]', "")
     );
-    const title = getFieldValue($metaBox, 'input[name="svg_viewer_title"]', "");
+    const title = getFieldValue($metaBox, 'input[name="btsvviewer_title"]', "");
     const caption = getFieldValue(
       $metaBox,
-      'textarea[name="svg_viewer_caption"]',
+      'textarea[name="btsvviewer_caption"]',
       ""
     );
     const controlsPositionValue = getFieldValue(
       $metaBox,
-      'select[name="svg_viewer_controls_position"]',
+      'select[name="btsvviewer_controls_position"]',
       "top"
     );
     const controlsButtonsValue = getFieldValue(
       $metaBox,
-      'input[name="svg_viewer_controls_buttons"]',
+      'input[name="btsvviewer_controls_buttons"]',
       "both"
     );
     const panModeRaw = getFieldValue(
       $metaBox,
-      'select[name="svg_viewer_pan_mode"]',
+      'select[name="btsvviewer_pan_mode"]',
       "scroll"
     );
     const zoomModeRaw = getFieldValue(
       $metaBox,
-      'select[name="svg_viewer_zoom_mode"]',
+      'select[name="btsvviewer_zoom_mode"]',
       "super_scroll"
     );
 
@@ -1033,7 +1033,7 @@
       initialZoom = clampedInitial;
       const percent = Math.round(initialZoom * 100);
       $metaBox
-        .find('input[name="svg_viewer_initial_zoom"]')
+        .find('input[name="btsvviewer_initial_zoom"]')
         .val(percent.toString());
     }
 
@@ -1070,7 +1070,7 @@
         .addClass("zoom-mode-" + resolvedZoomMode);
     }
 
-    const currentInstances = window.svgViewerInstances || {};
+    const currentInstances = window.btsvviewerInstances || {};
     if (currentInstances[viewerId] && currentInstances[viewerId].destroy) {
       try {
         currentInstances[viewerId].destroy();
@@ -1101,8 +1101,8 @@
       $interactionCaption.attr("hidden", true).empty();
     }
 
-    if (typeof window.svgViewerInstances === "undefined") {
-      window.svgViewerInstances = {};
+    if (typeof window.btsvviewerInstances === "undefined") {
+      window.btsvviewerInstances = {};
     }
 
     const instance = new SVGViewer({
@@ -1118,17 +1118,17 @@
       panMode: resolvedPanMode,
       zoomMode: resolvedZoomMode,
     });
-    window.svgViewerInstances[viewerId] = instance;
+    window.btsvviewerInstances[viewerId] = instance;
   }
 
   function captureViewerState($metaBox, viewerId, $status) {
     if (
-      typeof window.svgViewerInstances === "undefined" ||
-      !window.svgViewerInstances[viewerId]
+      typeof window.btsvviewerInstances === "undefined" ||
+      !window.btsvviewerInstances[viewerId]
     ) {
       $status
         .text(
-          (window.svgViewerAdmin && svgViewerAdmin.i18n.captureFailed) ||
+          (window.btsvviewerAdmin && btsvviewerAdmin.i18n.captureFailed) ||
             "Unable to capture the current state. Refresh the preview and try again."
         )
         .addClass("error");
@@ -1138,19 +1138,19 @@
       return;
     }
 
-    const viewer = window.svgViewerInstances[viewerId];
+    const viewer = window.btsvviewerInstances[viewerId];
     const center = viewer.getVisibleCenterPoint();
     const zoomPercent = Math.round((viewer.currentZoom || 1) * 100);
 
     $metaBox
-      .find('input[name="svg_viewer_initial_zoom"]')
+      .find('input[name="btsvviewer_initial_zoom"]')
       .val(zoomPercent.toString());
     setCenterFields($metaBox, center);
 
     $status
       .removeClass("error")
       .text(
-        (window.svgViewerAdmin && svgViewerAdmin.i18n.captureSaved) ||
+        (window.btsvviewerAdmin && btsvviewerAdmin.i18n.captureSaved) ||
           "Captured viewer state from the preview."
       );
     setTimeout(function () {
@@ -1234,8 +1234,8 @@
     ) {
       return;
     }
-    const $centerX = $metaBox.find('input[name="svg_viewer_center_x"]');
-    const $centerY = $metaBox.find('input[name="svg_viewer_center_y"]');
+    const $centerX = $metaBox.find('input[name="btsvviewer_center_x"]');
+    const $centerY = $metaBox.find('input[name="btsvviewer_center_y"]');
     if (!$centerX.length || !$centerY.length) {
       return;
     }
@@ -1248,11 +1248,11 @@
     if (
       typeof viewerId === "string" &&
       viewerId.length &&
-      window.svgViewerInstances &&
-      window.svgViewerInstances[viewerId] &&
-      typeof window.svgViewerInstances[viewerId].setManualCenter === "function"
+      window.btsvviewerInstances &&
+      window.btsvviewerInstances[viewerId] &&
+      typeof window.btsvviewerInstances[viewerId].setManualCenter === "function"
     ) {
-      window.svgViewerInstances[viewerId].setManualCenter(center.x, center.y, {
+      window.btsvviewerInstances[viewerId].setManualCenter(center.x, center.y, {
         recenter: Boolean(options.recenterViewer),
       });
     }
@@ -1365,7 +1365,7 @@
     }
     const svgUrl =
       (attachmentData && attachmentData.url) ||
-      getFieldValue($metaBox, 'input[name="svg_viewer_src"]', "");
+      getFieldValue($metaBox, 'input[name="btsvviewer_src"]', "");
     if (!svgUrl) {
       return;
     }
@@ -1404,9 +1404,9 @@
           return;
         }
         const data = attachment.toJSON();
-        $metaBox.find('input[name="svg_viewer_src"]').val(data.url || "");
+        $metaBox.find('input[name="btsvviewer_src"]').val(data.url || "");
         if (data.id) {
-          $metaBox.find('input[name="svg_viewer_attachment_id"]').val(data.id);
+          $metaBox.find('input[name="btsvviewer_attachment_id"]').val(data.id);
         }
         autoPopulateCenterFields($metaBox, data);
       });
@@ -1432,17 +1432,17 @@
     const refreshColors = function () {
       const fill = getFieldValue(
         $metaBox,
-        'input[name="svg_viewer_button_fill"]',
+        'input[name="btsvviewer_button_fill"]',
         ""
       );
       const border = getFieldValue(
         $metaBox,
-        'input[name="svg_viewer_button_border"]',
+        'input[name="btsvviewer_button_border"]',
         ""
       );
       const foreground = getFieldValue(
         $metaBox,
-        'input[name="svg_viewer_button_foreground"]',
+        'input[name="btsvviewer_button_foreground"]',
         ""
       );
       const $target = resolveTargetWrapper();
@@ -1467,7 +1467,7 @@
 
     $metaBox.on(
       "input",
-      'input[name="svg_viewer_button_fill"], input[name="svg_viewer_button_border"], input[name="svg_viewer_button_foreground"]',
+      'input[name="btsvviewer_button_fill"], input[name="btsvviewer_button_border"], input[name="btsvviewer_button_foreground"]',
       function () {
         refreshColors();
       }
@@ -1543,7 +1543,7 @@
 
       // Auto-load preview if a source already exists
       const existingSrc = $metaBox
-        .find('input[name="svg_viewer_src"]')
+        .find('input[name="btsvviewer_src"]')
         .val()
         .trim();
       if (existingSrc) {
