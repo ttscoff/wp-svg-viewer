@@ -1,3 +1,27 @@
+<h3 id="1.0.20">1.0.20</h3>
+
+<p>2025&#8211;11&#8211;28 04:17</p>
+
+<h4 id="changed">CHANGED</h4>
+
+<ul>
+<li>Rename shortcode hooks, options, post types, and meta keys to the btsvviewer prefix with automatic migration for legacy data.</li>
+<li>Continue honoring existing [svg_viewer] embeds by registering the legacy shortcode and admin-post handlers alongside the new ones.</li>
+</ul>
+
+<h4 id="improved">IMPROVED</h4>
+
+<ul>
+<li>Scope localized JS globals (btsvviewerConfig, btsvviewerAdmin, window.btsvviewerInstances) to avoid conflicts with other plugins.</li>
+<li>Embed the resolved SVG URL in markup data attributes so presets and tests can read it without extra JavaScript.</li>
+</ul>
+
+<h4 id="fixed">FIXED</h4>
+
+<ul>
+<li>Align unit tests and runtime assets with the renamed identifiers to keep the suite green.</li>
+</ul>
+
 <h3 id="1.0.19">1.0.19</h3>
 
 <p>2025&#8211;11&#8211;19 10:40</p>
